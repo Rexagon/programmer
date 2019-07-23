@@ -26,6 +26,7 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
 
 # sitl
+set(sitl_DIR ${EXTLIBS_DIR}/sitl/dist)
 find_package(sitl CONFIG REQUIRED)
 
 # application

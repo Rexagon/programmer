@@ -1,0 +1,3 @@
+[submodule "extlibs/sitl"]
+	path = extlibs/sitl
+	url = git@git.module.ru:P13/sitl.git
