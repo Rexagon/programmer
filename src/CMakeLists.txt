@@ -1,4 +1,7 @@
+set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
+
 set(PROGRAMMER_SRC
+    ${INCLUDE_DIR}/MainWindow.h
     MainWindow.cpp
     main.cpp)
 
@@ -6,7 +9,7 @@ add_executable(programmer ${PROGRAMMER_SRC})
 
 target_include_directories(programmer
     PUBLIC
-        ${CMAKE_SOURCE_DIR}/include
+        ${INCLUDE_DIR}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
 )

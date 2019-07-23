@@ -7,6 +7,10 @@ elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
     set(SYSTEM_BIT_POSTFIX x86)
 endif()
 
+if(NOT DEFINED ENV{BOOST_ROOT})
+    set(ENV{BOOST_ROOT} C:/boost_1_70_0)
+endif()
+
 set(EXTLIBS_DIR ${CMAKE_SOURCE_DIR}/extlibs)
 set(BUILD_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/build)
 
@@ -26,7 +30,9 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
 
 # sitl
-set(sitl_DIR ${EXTLIBS_DIR}/sitl/dist)
+set(ENV{sitl_DIR} ${EXTLIBS_DIR}/sitl/dist)
+message($ENV{sitl_DIR})
+
 find_package(sitl CONFIG REQUIRED)
 
 # application
