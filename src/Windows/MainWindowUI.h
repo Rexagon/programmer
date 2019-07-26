@@ -7,12 +7,16 @@
 #include <QProgressBar>
 #include <QPushButton>
 
+#include "Widgets/SerialPortSelector.h"
+
 namespace app
 {
 class MainWindowUI final
 {
 public:
     explicit MainWindowUI(QMainWindow *window = nullptr);
+
+    SerialPortSelector *getSerialPortSelector() const;
 
     QFileDialog *getFileDialog() const;
     QPushButton *getFileSelectionButton() const;
@@ -32,6 +36,8 @@ private:
     QWidget *createBottomWorkspace();
 
     QMainWindow *m_window;
+
+    SerialPortSelector *m_serialPortSelector = nullptr;
 
     QFileDialog *m_fileDialog = nullptr;
     QPushButton *m_fileSelectionButton = nullptr;

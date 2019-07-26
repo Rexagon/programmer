@@ -36,6 +36,12 @@ MainWindowUI::MainWindowUI(QMainWindow *window)
 }
 
 
+SerialPortSelector *MainWindowUI::getSerialPortSelector() const
+{
+    return m_serialPortSelector;
+}
+
+
 QProgressBar *MainWindowUI::getProgressBar() const
 {
     return m_progressBar;
@@ -77,10 +83,29 @@ QWidget *MainWindowUI::createTopWorkspace()
     auto *container = new QWidget(m_window);
     auto *layout = new QHBoxLayout(container);
 
-    auto *workspaceWidget = new QWidget();
-    workspaceWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(workspaceWidget);
+    container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    // Left side
+    auto *leftContainer = new QWidget(m_window);
+    auto *leftLayout = new QVBoxLayout(leftContainer);
+
+    QLabel *serialPortLabel = new QLabel("Порт:", m_window);
+    leftLayout->addWidget(serialPortLabel);
+
+    m_serialPortSelector = new SerialPortSelector(m_window);
+    leftLayout->addWidget(m_serialPortSelector);
+
+    layout->addWidget(leftContainer);
+
+    leftLayout->addStretch();
+
+    // Right side
+    auto *rightContainer = new QWidget(m_window);
+    /*auto *rightLayout = */ new QVBoxLayout(rightContainer);
+
+    layout->addWidget(rightContainer);
+
+    //
     return container;
 }
 

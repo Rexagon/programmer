@@ -1,10 +1,16 @@
 set(PROGRAMMER_SRC
+    Models/SerialPortListModel.cpp
+    Widgets/SerialPortSelector.cpp
     Windows/MainWindow.cpp
     Windows/MainWindowUI.cpp
-    main.cpp)
+    main.cpp
+)
 
 set(PROGRAMMER_MOC_TARGETS
-    Windows/MainWindow.h)
+    Models/SerialPortListModel.h
+    Widgets/SerialPortSelector.h
+    Windows/MainWindow.h
+)
 
 add_executable(programmer ${PROGRAMMER_SRC} ${PROGRAMMER_MOC_TARGETS})
 
@@ -12,7 +18,7 @@ target_include_directories(programmer
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(programmer sitl::sitl Qt5::Core Qt5::Widgets)
+target_link_libraries(programmer sitl::sitl Qt5::Core Qt5::Widgets Qt5::SerialPort)
 
 target_compile_options(programmer PRIVATE
     -O2
