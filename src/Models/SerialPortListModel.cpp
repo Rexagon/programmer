@@ -34,7 +34,10 @@ QVariant SerialPortListModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::DisplayRole)
     {
-        return m_serialPorts[index.row()].portName();
+        auto description = m_serialPorts[index.row()].description();
+        auto name = m_serialPorts[index.row()].portName();
+
+        return QString("%1 (%2)").arg(description, name);
     }
 
     return {};

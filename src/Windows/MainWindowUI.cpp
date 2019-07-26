@@ -42,6 +42,12 @@ SerialPortSelector *MainWindowUI::getSerialPortSelector() const
 }
 
 
+BaudRateSelector *MainWindowUI::getBaudRateSelector() const
+{
+    return m_baudRateSelector;
+}
+
+
 QProgressBar *MainWindowUI::getProgressBar() const
 {
     return m_progressBar;
@@ -89,15 +95,24 @@ QWidget *MainWindowUI::createTopWorkspace()
     auto *leftContainer = new QWidget(m_window);
     auto *leftLayout = new QVBoxLayout(leftContainer);
 
+    // Serial port selector
     QLabel *serialPortLabel = new QLabel("Порт:", m_window);
     leftLayout->addWidget(serialPortLabel);
 
     m_serialPortSelector = new SerialPortSelector(m_window);
     leftLayout->addWidget(m_serialPortSelector);
 
-    layout->addWidget(leftContainer);
+    // Baud rate selector
+    QLabel *baudRateLabel = new QLabel("BaudRate:", m_window);
+    leftLayout->addWidget(baudRateLabel);
 
+    m_baudRateSelector = new BaudRateSelector(m_window);
+    leftLayout->addWidget(m_baudRateSelector);
+
+    //
     leftLayout->addStretch();
+
+    layout->addWidget(leftContainer);
 
     // Right side
     auto *rightContainer = new QWidget(m_window);

@@ -4,9 +4,10 @@ set(PROGRAMMER_SRC
     Windows/MainWindow.cpp
     Windows/MainWindowUI.cpp
     main.cpp
-)
+    Widgets/BaudRateSelector.cpp)
 
 set(PROGRAMMER_MOC_TARGETS
+    Widgets/BaudRateSelector.h
     Models/SerialPortListModel.h
     Widgets/SerialPortSelector.h
     Windows/MainWindow.h

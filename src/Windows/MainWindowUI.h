@@ -8,6 +8,7 @@
 #include <QPushButton>
 
 #include "Widgets/SerialPortSelector.h"
+#include "Widgets/BaudRateSelector.h"
 
 namespace app
 {
@@ -17,6 +18,7 @@ public:
     explicit MainWindowUI(QMainWindow *window = nullptr);
 
     SerialPortSelector *getSerialPortSelector() const;
+    BaudRateSelector *getBaudRateSelector() const;
 
     QFileDialog *getFileDialog() const;
     QPushButton *getFileSelectionButton() const;
@@ -38,6 +40,7 @@ private:
     QMainWindow *m_window;
 
     SerialPortSelector *m_serialPortSelector = nullptr;
+    BaudRateSelector *m_baudRateSelector = nullptr;
 
     QFileDialog *m_fileDialog = nullptr;
     QPushButton *m_fileSelectionButton = nullptr;
