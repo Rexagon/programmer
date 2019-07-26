@@ -1,17 +1,14 @@
-set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
-
 set(PROGRAMMER_SRC
-    ${INCLUDE_DIR}/MainWindow.h
     MainWindow.cpp
     main.cpp)
 
-add_executable(programmer ${PROGRAMMER_SRC})
+set(PROGRAMMER_MOC_TARGETS
+    MainWindow.h)
+
+add_executable(programmer ${PROGRAMMER_SRC} ${PROGRAMMER_MOC_TARGETS})
 
 target_include_directories(programmer
-    PUBLIC
-        ${INCLUDE_DIR}
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(programmer sitl::sitl Qt5::Core Qt5::Widgets)

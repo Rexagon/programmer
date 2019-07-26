@@ -7,8 +7,12 @@
 
 #include <QLabel>
 
+namespace app
+{
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     new QLabel("Hello world!", this);
 }
+
+} // namespace app

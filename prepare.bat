@@ -3,5 +3,5 @@
 git submodule init
 git submodule update
 
-cd extlibs/sitl/
+cd 3rdparty/sitl/
 call build_min.bat

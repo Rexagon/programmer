@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+namespace app
+{
 class MainWindow final : public QMainWindow
 {
     Q_OBJECT
@@ -13,5 +15,7 @@ public:
 
 private:
 };
+
+} // namespace app
 
 #endif // PROGRAMMER_MAINWINDOW_H

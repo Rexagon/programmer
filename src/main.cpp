@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 {
     QApplication programmer(argc, argv);
 
-    MainWindow mainWindow;
+    app::MainWindow mainWindow;
     mainWindow.show();
 
     return programmer.exec();
