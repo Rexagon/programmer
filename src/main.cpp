@@ -2,7 +2,7 @@
 
 #include <QApplication>
 
-#include "MainWindow.h"
+#include "Windows/MainWindow.h"
 
 int main(int argc, char **argv)
 {

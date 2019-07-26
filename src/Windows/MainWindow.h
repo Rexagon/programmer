@@ -1,7 +1,7 @@
 #ifndef PROGRAMMER_MAINWINDOW_H
 #define PROGRAMMER_MAINWINDOW_H
 
-#include <QMainWindow>
+#include "MainWindowUI.h"
 
 namespace app
 {
@@ -14,6 +14,9 @@ public:
     ~MainWindow() override = default;
 
 private:
+    void connectSignals();
+
+    MainWindowUI m_ui;
 };
 
 } // namespace app

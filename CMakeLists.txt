@@ -28,7 +28,7 @@ find_package(Boost REQUIRED COMPONENTS system)
 
 # Qt
 if (NOT DEFINED ENV{Qt5_DIR})
-    set(ENV{Qt5_DIR} C:/Qt/Qt5.12.3)
+    set(ENV{Qt5_DIR} C:/Qt/Qt5.12.3/5.12.3/mingw73_32/lib/cmake/Qt5)
 endif()
 
 set(CMAKE_AUTOMOC ON)

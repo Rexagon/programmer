@@ -1,9 +1,10 @@
 set(PROGRAMMER_SRC
-    MainWindow.cpp
+    Windows/MainWindow.cpp
+    Windows/MainWindowUI.cpp
     main.cpp)
 
 set(PROGRAMMER_MOC_TARGETS
-    MainWindow.h)
+    Windows/MainWindow.h)
 
 add_executable(programmer ${PROGRAMMER_SRC} ${PROGRAMMER_MOC_TARGETS})
 
@@ -38,4 +39,23 @@ target_compile_options(programmer PRIVATE
 target_compile_features(programmer PUBLIC
     cxx_std_17
     cxx_user_literals
+)
+
+set_target_properties(programmer
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${BUILD_OUTPUT_DIR}
+)
+
+# deployment
+
+set(WINDEPLOYQT_EXE $ENV{Qt5_DIR}/../../../bin/windeployqt.exe)
+
+if(CMAKE_BUILD_TYPE MATCHES Release)
+    set(DEPLOYMENT_FLAGS --no-quick-import --no-translations --release)
+elseif()
+    set(DEPLOYMENT_FLAGS --no-quick-import --no-translations --debug)
+endif()
+
+add_custom_command(TARGET programmer POST_BUILD
+    COMMAND ${WINDEPLOYQT_EXE} ${DEPLOYMENT_FLAGS} ${BUILD_OUTPUT_DIR}/programmer.exe
 )
