@@ -31,6 +31,9 @@ public:
 
     LinkButton *getViewModeToggle() const;
 
+    QPushButton *getDumpButton() const;
+    QPushButton *getClearButton() const;
+
     QPushButton *getVerifyButton() const;
     QPushButton *getWriteButton() const;
 
@@ -52,6 +55,10 @@ private:
     SectorsTableWidget *m_sectorsTable = nullptr;
 
     LinkButton *m_viewModeToggle = nullptr;
+
+    QPushButton *m_dumpButton = nullptr;
+    QPushButton *m_clearButton = nullptr;
+
     QPushButton *m_verifyButton = nullptr;
     QPushButton *m_writeButton = nullptr;
 };

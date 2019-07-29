@@ -8,6 +8,11 @@
 #include <QHeaderView>
 #include <QVBoxLayout>
 
+namespace
+{
+constexpr auto TABLE_HEIGHT_MIN = 144;
+}
+
 namespace app
 {
 SectorsTableWidget::SectorsTableWidget(QWidget *parent)
@@ -36,6 +41,7 @@ void SectorsTableWidget::createUI()
     m_tableView->setSelectionMode(QTableView::NoSelection);
     m_tableView->setFocusPolicy(Qt::NoFocus);
     m_tableView->verticalHeader()->setVisible(false);
+    m_tableView->setMinimumHeight(TABLE_HEIGHT_MIN);
     layout->addWidget(m_tableView);
 }
 

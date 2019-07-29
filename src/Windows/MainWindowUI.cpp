@@ -10,13 +10,19 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QGridLayout>
+
+namespace
+{
+constexpr auto WINDOW_WIDTH_MIN = 250;
+}
 
 namespace app
 {
 MainWindowUI::MainWindowUI(QMainWindow *window)
     : m_window{window}
 {
-    m_window->setMinimumWidth(350);
+    m_window->setMinimumWidth(WINDOW_WIDTH_MIN);
 
     auto *container = new QWidget(m_window);
     auto *layout = new QVBoxLayout(container);
@@ -36,6 +42,9 @@ void MainWindowUI::setViewMode(ViewMode mode)
     m_viewModeToggle->setText(mode == ViewMode::COMPACT ? "Расширенный режим" : "Простой режим");
 
     m_sectorsSelectionWrapper->setCurrentIndex(mode == ViewMode::COMPACT ? 0 : 1);
+
+    m_dumpButton->setVisible(mode == ViewMode::EXTENDED);
+    m_clearButton->setVisible(mode == ViewMode::EXTENDED);
 }
 
 
@@ -49,6 +58,8 @@ void MainWindowUI::setApplicationState(ApplicationState state)
 {
     m_sectorsSelectionWrapper->setEnabled(state != ApplicationState::DISCONNECTED);
 
+    m_dumpButton->setEnabled(state != ApplicationState::DISCONNECTED);
+    m_clearButton->setEnabled(state != ApplicationState::DISCONNECTED);
     m_verifyButton->setEnabled(state != ApplicationState::DISCONNECTED);
     m_writeButton->setEnabled(state != ApplicationState::DISCONNECTED);
 }
@@ -73,6 +84,18 @@ LinkButton *MainWindowUI::getViewModeToggle() const
 }
 
 
+QPushButton *MainWindowUI::getDumpButton() const
+{
+    return m_dumpButton;
+}
+
+
+QPushButton *MainWindowUI::getClearButton() const
+{
+    return m_clearButton;
+}
+
+
 QPushButton *MainWindowUI::getVerifyButton() const
 {
     return m_verifyButton;
@@ -90,7 +113,7 @@ QWidget *MainWindowUI::createTopWorkspace()
     auto *container = new QWidget(m_window);
     auto *layout = new QVBoxLayout(container);
 
-    container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // Serial port selector
     m_connectionWidget = new ConnectionWidget(m_window);
@@ -130,6 +153,8 @@ QWidget *MainWindowUI::createBottomWorkspace()
     auto *container = new QWidget(m_window);
     auto *layout = new QVBoxLayout(container);
 
+    layout->setContentsMargins(0, 0, 0, 0);
+
     // View mode toggle
     auto *viewModeContainer = new QWidget(m_window);
     auto viewModeLayout = new QHBoxLayout(viewModeContainer);
@@ -148,13 +173,19 @@ QWidget *MainWindowUI::createBottomWorkspace()
 
     // Action widgets group
     auto *actionsContainer = new QWidget(m_window);
-    auto *actionsLayout = new QHBoxLayout(actionsContainer);
+    auto *actionsLayout = new QGridLayout(actionsContainer);
+
+    m_dumpButton = new QPushButton("Считать", m_window);
+    actionsLayout->addWidget(m_dumpButton, 0, 0);
+
+    m_clearButton = new QPushButton("Очистить", m_window);
+    actionsLayout->addWidget(m_clearButton, 0, 1);
 
     m_verifyButton = new QPushButton("Проверить", m_window);
-    actionsLayout->addWidget(m_verifyButton);
+    actionsLayout->addWidget(m_verifyButton, 1, 0);
 
     m_writeButton = new QPushButton("Записать", m_window);
-    actionsLayout->addWidget(m_writeButton);
+    actionsLayout->addWidget(m_writeButton, 1, 1);
 
     layout->addWidget(actionsContainer);
 

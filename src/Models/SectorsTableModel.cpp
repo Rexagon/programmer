@@ -96,7 +96,7 @@ QVariant SectorsTableModel::data(const QModelIndex &index, int role) const
                 return QString("SA%1").arg(index.row());
 
             case 1:
-                return QString("%1KБ").arg(m_sectors[index.row()].size);
+                return QString("%1 KБ").arg(m_sectors[index.row()].size);
 
             default:
                 break;
