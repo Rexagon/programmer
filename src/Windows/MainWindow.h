@@ -2,6 +2,7 @@
 #define PROGRAMMER_MAINWINDOW_H
 
 #include "MainWindowUI.h"
+#include "Models/SectorsTableModel.h"
 
 namespace app
 {
@@ -21,6 +22,8 @@ private:
     ViewMode m_viewMode;
     ConnectionState m_connectionState;
     ApplicationState m_applicationState;
+    
+    SectorsTableModel m_sectorsTableModel{};
 };
 
 } // namespace app

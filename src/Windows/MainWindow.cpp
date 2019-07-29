@@ -10,8 +10,8 @@
 namespace
 {
 constexpr auto DEFAULT_VIEW_MODE = app::ViewMode::COMPACT;
-constexpr auto DEFAULT_CONNECTION_STATE = app::ConnectionState::DISCONNECTED;
-constexpr auto DEFAULT_APPLICATION_STATE = app::ApplicationState::DISCONNECTED;
+constexpr auto DEFAULT_CONNECTION_STATE = app::ConnectionState::CONNECTED;
+constexpr auto DEFAULT_APPLICATION_STATE = app::ApplicationState::CONNECTED;
 } // namespace
 
 namespace app
@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_ui.setViewMode(m_viewMode);
     m_ui.setConnectionState(m_connectionState);
     m_ui.setApplicationState(m_applicationState);
+    m_ui.setSectorsTableModel(&m_sectorsTableModel);
 
     connectSignals();
 }

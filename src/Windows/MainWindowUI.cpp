@@ -35,7 +35,7 @@ void MainWindowUI::setViewMode(ViewMode mode)
 
     m_viewModeToggle->setText(mode == ViewMode::COMPACT ? "Расширенный режим" : "Простой режим");
 
-    m_sectorSelectionWrapper->setCurrentIndex(mode == ViewMode::COMPACT ? 0 : 1);
+    m_sectorsSelectionWrapper->setCurrentIndex(mode == ViewMode::COMPACT ? 0 : 1);
 }
 
 
@@ -47,10 +47,17 @@ void MainWindowUI::setConnectionState(app::ConnectionState state)
 
 void MainWindowUI::setApplicationState(ApplicationState state)
 {
-    m_sectorSelectionWrapper->setEnabled(state != ApplicationState::DISCONNECTED);
+    m_sectorsSelectionWrapper->setEnabled(state != ApplicationState::DISCONNECTED);
 
     m_verifyButton->setEnabled(state != ApplicationState::DISCONNECTED);
     m_writeButton->setEnabled(state != ApplicationState::DISCONNECTED);
+}
+
+
+void MainWindowUI::setSectorsTableModel(SectorsTableModel *model)
+{
+    m_sectorsPresets->setModel(model);
+    m_sectorsTable->setModel(model);
 }
 
 
@@ -90,24 +97,30 @@ QWidget *MainWindowUI::createTopWorkspace()
     layout->addWidget(m_connectionWidget);
 
     // Sector selection
-    m_sectorSelectionWrapper = new QStackedWidget(m_window);
-    layout->addWidget(m_sectorSelectionWrapper);
+    m_sectorsSelectionWrapper = new QStackedWidget(m_window);
+    m_sectorsSelectionWrapper->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(m_sectorsSelectionWrapper);
 
     // Compact mode
     auto *sectorPresetsContainer = new QWidget(m_window);
     auto *sectorPresetsLayout = new QVBoxLayout(sectorPresetsContainer);
 
-    m_sectorPresets = new SectorPresetsWidget(m_window);
-    sectorPresetsLayout->addWidget(m_sectorPresets);
+    m_sectorsPresets = new SectorsPresetsWidget(m_window);
+    sectorPresetsLayout->addWidget(m_sectorsPresets);
     sectorPresetsLayout->addStretch();
 
-    m_sectorSelectionWrapper->addWidget(sectorPresetsContainer);
+    m_sectorsSelectionWrapper->addWidget(sectorPresetsContainer);
 
-    m_sectorSelectionWrapper->addWidget(new QLabel("// TODO", m_window));
+    // Extended mode
+    auto *sectorsTableContainer = new QWidget(m_window);
+    auto *sectorsTableLayout = new QVBoxLayout(sectorsTableContainer);
+
+    m_sectorsTable = new SectorsTableWidget(m_window);
+    sectorsTableLayout->addWidget(m_sectorsTable);
+
+    m_sectorsSelectionWrapper->addWidget(sectorsTableContainer);
 
     //
-    layout->addStretch();
-
     return container;
 }
 
