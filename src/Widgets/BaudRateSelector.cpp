@@ -6,6 +6,12 @@
 
 #include <QtSerialPort/QSerialPortInfo>
 
+namespace
+{
+constexpr auto DEFAULT_BAUD_RATE = 115200;
+}
+
+
 namespace app
 {
 BaudRateSelector::BaudRateSelector(QWidget *parent)
@@ -16,6 +22,12 @@ BaudRateSelector::BaudRateSelector(QWidget *parent)
     for (const auto &rate : baudRates)
     {
         addItem(QString::number(rate), rate);
+    }
+
+    const auto index = findData(static_cast<qint32>(DEFAULT_BAUD_RATE));
+    if (index > 0)
+    {
+        setCurrentIndex(index);
     }
 }
 

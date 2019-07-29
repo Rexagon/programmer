@@ -7,13 +7,6 @@
 
 #include <QFileDialog>
 
-namespace
-{
-constexpr auto WINDOW_WIDTH_MIN = 900;
-constexpr auto WINDOW_HEIGHT_MIN = 600;
-} // namespace
-
-
 namespace app
 {
 MainWindow::MainWindow(QWidget *parent)
@@ -26,12 +19,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::connectSignals()
 {
-    connect(m_ui.getFileSelectionButton(), &QPushButton::clicked, [this]() {
-        m_ui.getFileDialog()->show();
-    });
+    connect(m_ui.getViewModeToggle(), &LinkButton::clicked, [this]() { m_ui.toggleExtended(); });
 
-    connect(m_ui.getFileDialog(), &QFileDialog::fileSelected, [this](const QString &file) {
-        m_ui.setSelectedFilePath(file);
+    connect(m_ui.getWriteButton(), &QPushButton::clicked, [this]() {
+        QFileDialog::getOpenFileName(this, "Open Document", QDir::currentPath(), "(*.mem) ;; All files (*.*)");
     });
 }
 

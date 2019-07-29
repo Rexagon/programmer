@@ -15,6 +15,8 @@ public:
 
     void refresh();
 
+    bool isEmpty() const;
+
 private:
     int rowCount(const QModelIndex &parent) const override;
     QVariant data(const QModelIndex &index, int role) const override;

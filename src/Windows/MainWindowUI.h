@@ -7,24 +7,30 @@
 #include <QProgressBar>
 #include <QPushButton>
 
-#include "Widgets/SerialPortSelector.h"
-#include "Widgets/BaudRateSelector.h"
+#include "Widgets/ConnectionWidget.h"
+#include "Widgets/LinkButton.h"
 
 namespace app
 {
 class MainWindowUI final
 {
 public:
+    enum ViewMode
+    {
+        COMPACT,
+        EXTENDED
+    };
+
     explicit MainWindowUI(QMainWindow *window = nullptr);
 
-    SerialPortSelector *getSerialPortSelector() const;
-    BaudRateSelector *getBaudRateSelector() const;
+    void toggleExtended();
+    void setExtended(bool extended);
+    bool isExtended() const;
 
-    QFileDialog *getFileDialog() const;
-    QPushButton *getFileSelectionButton() const;
-    void setSelectedFilePath(const QString &path);
+    ConnectionWidget *getConnectionWidget() const;
 
-    QProgressBar *getProgressBar() const;
+    LinkButton *getViewModeToggle() const;
+
     QPushButton *getVerifyButton() const;
     QPushButton *getWriteButton() const;
 
@@ -39,14 +45,11 @@ private:
 
     QMainWindow *m_window;
 
-    SerialPortSelector *m_serialPortSelector = nullptr;
-    BaudRateSelector *m_baudRateSelector = nullptr;
+    bool m_isExtended;
 
-    QFileDialog *m_fileDialog = nullptr;
-    QPushButton *m_fileSelectionButton = nullptr;
-    QLabel *m_selectedFileLabel = nullptr;
+    ConnectionWidget *m_connectionWidget = nullptr;
 
-    QProgressBar *m_progressBar = nullptr;
+    LinkButton *m_viewModeToggle = nullptr;
     QPushButton *m_verifyButton = nullptr;
     QPushButton *m_writeButton = nullptr;
 };

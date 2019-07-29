@@ -19,6 +19,12 @@ void SerialPortListModel::refresh()
 }
 
 
+bool SerialPortListModel::isEmpty() const
+{
+    return m_serialPorts.empty();
+}
+
+
 int SerialPortListModel::rowCount(const QModelIndex & /*parent*/) const
 {
     return m_serialPorts.size();

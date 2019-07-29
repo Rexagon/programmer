@@ -1,14 +1,18 @@
 set(PROGRAMMER_SRC
     Models/SerialPortListModel.cpp
+    Widgets/BaudRateSelector.cpp
+    Widgets/ConnectionWidget.cpp
+    Widgets/LinkButton.cpp
     Widgets/SerialPortSelector.cpp
     Windows/MainWindow.cpp
     Windows/MainWindowUI.cpp
-    main.cpp
-    Widgets/BaudRateSelector.cpp)
+    main.cpp)
 
 set(PROGRAMMER_MOC_TARGETS
-    Widgets/BaudRateSelector.h
     Models/SerialPortListModel.h
+    Widgets/BaudRateSelector.h
+    Widgets/ConnectionWidget.h
+    Widgets/LinkButton.h
     Widgets/SerialPortSelector.h
     Windows/MainWindow.h
 )

@@ -11,19 +11,13 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-namespace
-{
-constexpr auto WINDOW_WIDTH_MIN = 900;
-constexpr auto WINDOW_HEIGHT_MIN = 600;
-} // namespace
-
-
 namespace app
 {
 MainWindowUI::MainWindowUI(QMainWindow *window)
     : m_window{window}
+    , m_isExtended{false}
 {
-    m_window->setMinimumSize(WINDOW_WIDTH_MIN, WINDOW_HEIGHT_MIN);
+    m_window->setMinimumWidth(350);
 
     auto *container = new QWidget(m_window);
     auto *layout = new QVBoxLayout(container);
@@ -33,24 +27,43 @@ MainWindowUI::MainWindowUI(QMainWindow *window)
     layout->addWidget(createBottomWorkspace());
 
     m_window->setCentralWidget(container);
+
+    setExtended(m_isExtended);
 }
 
 
-SerialPortSelector *MainWindowUI::getSerialPortSelector() const
+void MainWindowUI::toggleExtended()
 {
-    return m_serialPortSelector;
+    setExtended(!m_isExtended);
 }
 
 
-BaudRateSelector *MainWindowUI::getBaudRateSelector() const
+void MainWindowUI::setExtended(bool extended)
 {
-    return m_baudRateSelector;
+    m_connectionWidget->setViewMode(extended ? ConnectionWidget::ViewMode::EXTENDED
+                                             : ConnectionWidget::ViewMode::COMPACT);
+
+    m_viewModeToggle->setText(extended ? "Простой режим" : "Расширенный режим");
+
+    m_isExtended = extended;
 }
 
 
-QProgressBar *MainWindowUI::getProgressBar() const
+bool MainWindowUI::isExtended() const
 {
-    return m_progressBar;
+    return m_isExtended;
+}
+
+
+ConnectionWidget *MainWindowUI::getConnectionWidget() const
+{
+    return m_connectionWidget;
+}
+
+
+LinkButton *MainWindowUI::getViewModeToggle() const
+{
+    return m_viewModeToggle;
 }
 
 
@@ -66,59 +79,18 @@ QPushButton *MainWindowUI::getWriteButton() const
 }
 
 
-QFileDialog *MainWindowUI::getFileDialog() const
-{
-    return m_fileDialog;
-}
-
-
-QPushButton *MainWindowUI::getFileSelectionButton() const
-{
-    return m_fileSelectionButton;
-}
-
-
-void MainWindowUI::setSelectedFilePath(const QString &path)
-{
-    m_selectedFileLabel->setText(path);
-}
-
-
 QWidget *MainWindowUI::createTopWorkspace()
 {
     auto *container = new QWidget(m_window);
-    auto *layout = new QHBoxLayout(container);
+    auto *layout = new QVBoxLayout(container);
 
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    // Left side
-    auto *leftContainer = new QWidget(m_window);
-    auto *leftLayout = new QVBoxLayout(leftContainer);
-
     // Serial port selector
-    QLabel *serialPortLabel = new QLabel("Порт:", m_window);
-    leftLayout->addWidget(serialPortLabel);
+    m_connectionWidget = new ConnectionWidget(m_window);
+    layout->addWidget(m_connectionWidget);
 
-    m_serialPortSelector = new SerialPortSelector(m_window);
-    leftLayout->addWidget(m_serialPortSelector);
-
-    // Baud rate selector
-    QLabel *baudRateLabel = new QLabel("BaudRate:", m_window);
-    leftLayout->addWidget(baudRateLabel);
-
-    m_baudRateSelector = new BaudRateSelector(m_window);
-    leftLayout->addWidget(m_baudRateSelector);
-
-    //
-    leftLayout->addStretch();
-
-    layout->addWidget(leftContainer);
-
-    // Right side
-    auto *rightContainer = new QWidget(m_window);
-    /*auto *rightLayout = */ new QVBoxLayout(rightContainer);
-
-    layout->addWidget(rightContainer);
+    layout->addStretch();
 
     //
     return container;
@@ -130,20 +102,15 @@ QWidget *MainWindowUI::createBottomWorkspace()
     auto *container = new QWidget(m_window);
     auto *layout = new QVBoxLayout(container);
 
-    // File selection widgets group
-    auto *fileSelectionContainer = new QWidget(m_window);
-    auto *fileSelectionLayout = new QHBoxLayout(fileSelectionContainer);
+    // View mode toggle
+    auto *viewModeContainer = new QWidget(m_window);
+    auto viewModeLayout = new QHBoxLayout(viewModeContainer);
 
-    m_fileDialog = new QFileDialog(m_window);
+    m_viewModeToggle = new LinkButton(m_window);
+    viewModeLayout->addWidget(m_viewModeToggle);
+    viewModeLayout->addStretch();
 
-    m_fileSelectionButton = new QPushButton("Выбрать файл", m_window);
-    fileSelectionLayout->addWidget(m_fileSelectionButton);
-
-    m_selectedFileLabel = new QLabel("");
-    m_selectedFileLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    fileSelectionLayout->addWidget(m_selectedFileLabel);
-
-    layout->addWidget(fileSelectionContainer);
+    layout->addWidget(viewModeContainer);
 
     // Separator
     auto *separator = new QFrame;
@@ -154,11 +121,6 @@ QWidget *MainWindowUI::createBottomWorkspace()
     // Action widgets group
     auto *actionsContainer = new QWidget(m_window);
     auto *actionsLayout = new QHBoxLayout(actionsContainer);
-
-    m_progressBar = new QProgressBar(m_window);
-    m_progressBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    m_progressBar->setTextVisible(false);
-    actionsLayout->addWidget(m_progressBar);
 
     m_verifyButton = new QPushButton("Проверить", m_window);
     actionsLayout->addWidget(m_verifyButton);
@@ -171,6 +133,5 @@ QWidget *MainWindowUI::createBottomWorkspace()
     //
     return container;
 }
-
 
 } // namespace app

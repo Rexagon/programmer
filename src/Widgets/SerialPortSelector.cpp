@@ -15,6 +15,13 @@ SerialPortSelector::SerialPortSelector(QWidget *parent)
     , m_serialPortListModel{parent}
 {
     setModel(&m_serialPortListModel);
+    m_serialPortListModel.refresh();
+
+    if (!m_serialPortListModel.isEmpty())
+    {
+        // TODO: restore from last session
+        setCurrentIndex(0);
+    }
 }
 
 
