@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QWidget>
 
+#include "General.h"
 #include "BaudRateSelector.h"
 #include "SerialPortSelector.h"
 
@@ -17,26 +18,11 @@ class ConnectionWidget : public QWidget
     Q_OBJECT
 
 public:
-    enum class ViewMode
-    {
-        COMPACT,
-        EXTENDED
-    };
-
-    enum class State
-    {
-        DISCONNECTED,
-        CONNECTING,
-        CONNECTED
-    };
-
     explicit ConnectionWidget(QWidget *parent = nullptr);
 
     void setViewMode(ViewMode mode);
-    ViewMode getViewMode() const;
 
-    void setState(State state);
-    State getState() const;
+    void setConnectionState(ConnectionState state);
 
     SerialPortSelector *getSerialPortSelector() const;
     BaudRateSelector *getBaudRateSelector() const;
@@ -57,8 +43,7 @@ private:
     void createUI();
     void connectSignals();
 
-    ViewMode m_viewMode;
-    State m_state;
+    ConnectionState m_state{};
 
     SerialPortSelector *m_serialPortSelector = nullptr;
 

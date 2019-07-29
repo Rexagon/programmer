@@ -7,19 +7,36 @@
 
 #include <QFileDialog>
 
+namespace
+{
+constexpr auto DEFAULT_VIEW_MODE = app::ViewMode::COMPACT;
+constexpr auto DEFAULT_CONNECTION_STATE = app::ConnectionState::DISCONNECTED;
+constexpr auto DEFAULT_APPLICATION_STATE = app::ApplicationState::DISCONNECTED;
+} // namespace
+
 namespace app
 {
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow{parent}
     , m_ui{this}
+    , m_viewMode{DEFAULT_VIEW_MODE}
+    , m_connectionState{DEFAULT_CONNECTION_STATE}
+    , m_applicationState{DEFAULT_APPLICATION_STATE}
 {
+    m_ui.setViewMode(m_viewMode);
+    m_ui.setConnectionState(m_connectionState);
+    m_ui.setApplicationState(m_applicationState);
+
     connectSignals();
 }
 
 
 void MainWindow::connectSignals()
 {
-    connect(m_ui.getViewModeToggle(), &LinkButton::clicked, [this]() { m_ui.toggleExtended(); });
+    connect(m_ui.getViewModeToggle(), &LinkButton::clicked, [this]() {
+        m_viewMode = !m_viewMode;
+        m_ui.setViewMode(m_viewMode);
+    });
 
     connect(m_ui.getWriteButton(), &QPushButton::clicked, [this]() {
         QFileDialog::getOpenFileName(this, "Open Document", QDir::currentPath(), "(*.mem) ;; All files (*.*)");

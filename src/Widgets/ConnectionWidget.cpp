@@ -7,60 +7,41 @@
 
 #include <QVBoxLayout>
 
-namespace
-{
-constexpr auto DEFAULT_VIEW_MODE = app::ConnectionWidget::ViewMode::COMPACT;
-constexpr auto DEFAULT_STATE = app::ConnectionWidget::State::DISCONNECTED;
-} // namespace
-
 namespace app
 {
 ConnectionWidget::ConnectionWidget(QWidget *parent)
     : QWidget{parent}
-    , m_viewMode{DEFAULT_VIEW_MODE}
-    , m_state{DEFAULT_STATE}
 {
     createUI();
-    setViewMode(m_viewMode);
-    setState(m_state);
-
     connectSignals();
 }
 
 
-void ConnectionWidget::setViewMode(app::ConnectionWidget::ViewMode mode)
+void ConnectionWidget::setViewMode(ViewMode mode)
 {
     m_baudRateLabel->setVisible(mode == ViewMode::EXTENDED);
     m_baudRateSelector->setVisible(mode == ViewMode::EXTENDED);
-
-    m_viewMode = mode;
 }
 
 
-ConnectionWidget::ViewMode ConnectionWidget::getViewMode() const
+void ConnectionWidget::setConnectionState(ConnectionState state)
 {
-    return m_viewMode;
-}
-
-
-void ConnectionWidget::setState(State state)
-{
-    m_baudRateSelector->setEnabled(state != State::CONNECTING);
-    m_serialPortSelector->setEnabled(state != State::CONNECTING);
-    m_connectionToggleButton->setEnabled(state != State::CONNECTING);
+    m_baudRateSelector->setEnabled(state != ConnectionState::CONNECTING);
+    m_serialPortSelector->setEnabled(state != ConnectionState::CONNECTING);
+    m_connectionToggleButton->setEnabled(state != ConnectionState::CONNECTING);
 
     QString buttonText{};
     switch (state)
     {
-        case State::DISCONNECTED:
+        case ConnectionState::DISCONNECTED:
             buttonText = "Подключить";
             break;
 
-        case State::CONNECTING:
+        case ConnectionState::CONNECTING:
             buttonText = "Подключение...";
             break;
 
-        case State::CONNECTED:
+        case ConnectionState::CONNECTED:
             buttonText = "Отключить";
             break;
     }
@@ -68,12 +49,6 @@ void ConnectionWidget::setState(State state)
     m_connectionToggleButton->setText(buttonText);
 
     m_state = state;
-}
-
-
-ConnectionWidget::State ConnectionWidget::getState() const
-{
-    return m_state;
 }
 
 
@@ -136,11 +111,11 @@ void ConnectionWidget::connectSignals()
     connect(m_connectionToggleButton, &QPushButton::clicked, [this]() {
         switch (m_state)
         {
-            case State::DISCONNECTED:
+            case ConnectionState::DISCONNECTED:
                 emit connectionRequest();
                 break;
 
-            case State::CONNECTED:
+            case ConnectionState::CONNECTED:
                 emit disconnectionRequest();
 
             default:

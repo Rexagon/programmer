@@ -15,7 +15,6 @@ namespace app
 {
 MainWindowUI::MainWindowUI(QMainWindow *window)
     : m_window{window}
-    , m_isExtended{false}
 {
     m_window->setMinimumWidth(350);
 
@@ -27,31 +26,31 @@ MainWindowUI::MainWindowUI(QMainWindow *window)
     layout->addWidget(createBottomWorkspace());
 
     m_window->setCentralWidget(container);
-
-    setExtended(m_isExtended);
 }
 
 
-void MainWindowUI::toggleExtended()
+void MainWindowUI::setViewMode(ViewMode mode)
 {
-    setExtended(!m_isExtended);
+    m_connectionWidget->setViewMode(mode);
+
+    m_viewModeToggle->setText(mode == ViewMode::COMPACT ? "Расширенный режим" : "Простой режим");
+
+    m_sectorSelectionWrapper->setCurrentIndex(mode == ViewMode::COMPACT ? 0 : 1);
 }
 
 
-void MainWindowUI::setExtended(bool extended)
+void MainWindowUI::setConnectionState(app::ConnectionState state)
 {
-    m_connectionWidget->setViewMode(extended ? ConnectionWidget::ViewMode::EXTENDED
-                                             : ConnectionWidget::ViewMode::COMPACT);
-
-    m_viewModeToggle->setText(extended ? "Простой режим" : "Расширенный режим");
-
-    m_isExtended = extended;
+    m_connectionWidget->setConnectionState(state);
 }
 
 
-bool MainWindowUI::isExtended() const
+void MainWindowUI::setApplicationState(ApplicationState state)
 {
-    return m_isExtended;
+    m_sectorSelectionWrapper->setEnabled(state != ApplicationState::DISCONNECTED);
+
+    m_verifyButton->setEnabled(state != ApplicationState::DISCONNECTED);
+    m_writeButton->setEnabled(state != ApplicationState::DISCONNECTED);
 }
 
 
@@ -90,9 +89,25 @@ QWidget *MainWindowUI::createTopWorkspace()
     m_connectionWidget = new ConnectionWidget(m_window);
     layout->addWidget(m_connectionWidget);
 
-    layout->addStretch();
+    // Sector selection
+    m_sectorSelectionWrapper = new QStackedWidget(m_window);
+    layout->addWidget(m_sectorSelectionWrapper);
+
+    // Compact mode
+    auto *sectorPresetsContainer = new QWidget(m_window);
+    auto *sectorPresetsLayout = new QVBoxLayout(sectorPresetsContainer);
+
+    m_sectorPresets = new SectorPresetsWidget(m_window);
+    sectorPresetsLayout->addWidget(m_sectorPresets);
+    sectorPresetsLayout->addStretch();
+
+    m_sectorSelectionWrapper->addWidget(sectorPresetsContainer);
+
+    m_sectorSelectionWrapper->addWidget(new QLabel("// TODO", m_window));
 
     //
+    layout->addStretch();
+
     return container;
 }
 

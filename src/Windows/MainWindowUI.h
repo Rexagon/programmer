@@ -1,31 +1,28 @@
 #ifndef PROGRAMMER_MAINWINDOWUI_H
 #define PROGRAMMER_MAINWINDOWUI_H
 
-#include <QFileDialog>
 #include <QLabel>
 #include <QMainWindow>
-#include <QProgressBar>
 #include <QPushButton>
+#include <QStackedWidget>
 
+#include "General.h"
 #include "Widgets/ConnectionWidget.h"
 #include "Widgets/LinkButton.h"
+#include "Widgets/SectorPresetsWidget.h"
 
 namespace app
 {
 class MainWindowUI final
 {
 public:
-    enum ViewMode
-    {
-        COMPACT,
-        EXTENDED
-    };
-
     explicit MainWindowUI(QMainWindow *window = nullptr);
 
-    void toggleExtended();
-    void setExtended(bool extended);
-    bool isExtended() const;
+    void setViewMode(ViewMode mode);
+
+    void setConnectionState(ConnectionState state);
+
+    void setApplicationState(ApplicationState state);
 
     ConnectionWidget *getConnectionWidget() const;
 
@@ -45,9 +42,10 @@ private:
 
     QMainWindow *m_window;
 
-    bool m_isExtended;
-
     ConnectionWidget *m_connectionWidget = nullptr;
+
+    QStackedWidget *m_sectorSelectionWrapper = nullptr;
+    SectorPresetsWidget *m_sectorPresets = nullptr;
 
     LinkButton *m_viewModeToggle = nullptr;
     QPushButton *m_verifyButton = nullptr;

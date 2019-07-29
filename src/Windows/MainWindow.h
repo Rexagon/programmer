@@ -17,6 +17,10 @@ private:
     void connectSignals();
 
     MainWindowUI m_ui;
+
+    ViewMode m_viewMode;
+    ConnectionState m_connectionState;
+    ApplicationState m_applicationState;
 };
 
 } // namespace app
