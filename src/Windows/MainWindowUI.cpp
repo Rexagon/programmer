@@ -5,12 +5,9 @@
 
 #include "MainWindowUI.h"
 
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QProgressBar>
-#include <QPushButton>
-#include <QVBoxLayout>
 #include <QGridLayout>
+#include <QLabel>
+#include <QPushButton>
 
 namespace
 {
@@ -22,6 +19,7 @@ namespace app
 MainWindowUI::MainWindowUI(QMainWindow *window)
     : m_window{window}
 {
+    m_window->setWindowTitle("Программатор");
     m_window->setMinimumWidth(WINDOW_WIDTH_MIN);
 
     auto *container = new QWidget(m_window);
@@ -39,7 +37,7 @@ void MainWindowUI::setViewMode(ViewMode mode)
 {
     m_connectionWidget->setViewMode(mode);
 
-    m_viewModeToggle->setText(mode == ViewMode::COMPACT ? "Расширенный режим" : "Простой режим");
+    m_viewModeToggle->setText(toString(!mode));
 
     m_sectorsSelectionWrapper->setCurrentIndex(mode == ViewMode::COMPACT ? 0 : 1);
 
@@ -112,6 +110,8 @@ QWidget *MainWindowUI::createTopWorkspace()
 {
     auto *container = new QWidget(m_window);
     auto *layout = new QVBoxLayout(container);
+
+    layout->setContentsMargins(0, 0, 0, 0);
 
     // Serial port selector
     m_connectionWidget = new ConnectionWidget(m_window);

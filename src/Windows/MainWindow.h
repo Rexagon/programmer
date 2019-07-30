@@ -17,6 +17,8 @@ public:
 private:
     void connectSignals();
 
+    void syncState();
+
     MainWindowUI m_ui;
 
     ViewMode m_viewMode;

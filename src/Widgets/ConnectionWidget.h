@@ -3,10 +3,11 @@
 
 #include <QLabel>
 #include <QPushButton>
+#include <QStackedWidget>
 #include <QWidget>
 
-#include "General.h"
 #include "BaudRateSelector.h"
+#include "General.h"
 #include "SerialPortSelector.h"
 
 Q_DECLARE_METATYPE(QSerialPortInfo)
@@ -23,6 +24,9 @@ public:
     void setViewMode(ViewMode mode);
 
     void setConnectionState(ConnectionState state);
+
+    QSerialPortInfo getSelectedSerialPort() const;
+    qint32 getSelectedBaudRate() const;
 
     SerialPortSelector *getSerialPortSelector() const;
     BaudRateSelector *getBaudRateSelector() const;
@@ -43,12 +47,15 @@ private:
     void createUI();
     void connectSignals();
 
+    ViewMode m_viewMode{};
     ConnectionState m_state{};
 
+    QLabel *m_serialPortLabel = nullptr;
     SerialPortSelector *m_serialPortSelector = nullptr;
-
     QLabel *m_baudRateLabel = nullptr;
     BaudRateSelector *m_baudRateSelector = nullptr;
+
+    QLabel *m_connectionInfoLabel = nullptr;
 
     QPushButton *m_connectionToggleButton = nullptr;
 };

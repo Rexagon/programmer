@@ -93,6 +93,7 @@ void SectorPresetsWidget::setModel(app::SectorTableModel *model)
 void SectorPresetsWidget::createUI()
 {
     auto *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
 
     auto *label = new QLabel("Копии ПО:", this);
     layout->addWidget(label);

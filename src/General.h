@@ -1,6 +1,8 @@
 #ifndef PROGRAMMER_GENERAL_H
 #define PROGRAMMER_GENERAL_H
 
+#include <QString>
+
 namespace app
 {
 enum class ViewMode
@@ -9,7 +11,25 @@ enum class ViewMode
     EXTENDED
 };
 
+
 ViewMode operator!(const ViewMode &m);
+
+
+constexpr const char *toString(const ViewMode &m)
+{
+    switch (m)
+    {
+        case ViewMode::COMPACT:
+            return "Простой режим";
+
+        case ViewMode::EXTENDED:
+            return "Расширенный режим";
+
+        default:
+            return "";
+    }
+}
+
 
 enum class ConnectionState
 {
@@ -17,6 +37,7 @@ enum class ConnectionState
     CONNECTING,
     CONNECTED
 };
+
 
 enum class ApplicationState
 {
