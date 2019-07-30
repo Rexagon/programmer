@@ -10,8 +10,8 @@
 namespace
 {
 constexpr auto DEFAULT_VIEW_MODE = app::ViewMode::COMPACT;
-constexpr auto DEFAULT_CONNECTION_STATE = app::ConnectionState::CONNECTED;
-constexpr auto DEFAULT_APPLICATION_STATE = app::ApplicationState::CONNECTED;
+constexpr auto DEFAULT_CONNECTION_STATE = app::ConnectionState::DISCONNECTED;
+constexpr auto DEFAULT_APPLICATION_STATE = app::ApplicationState::DISCONNECTED;
 } // namespace
 
 namespace app

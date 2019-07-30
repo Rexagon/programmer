@@ -14,9 +14,10 @@ class SerialPortSelector final : public QComboBox
 public:
     explicit SerialPortSelector(QWidget *parent);
 
-private:
+protected:
     void showPopup() override;
 
+private:
     SerialPortListModel m_serialPortListModel;
 };
 

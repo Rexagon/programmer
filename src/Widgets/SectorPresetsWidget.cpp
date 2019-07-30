@@ -3,27 +3,63 @@
  * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
  */
 
-#include "SectorsPresetsWidget.h"
+#include "SectorPresetsWidget.h"
 
 #include <QCheckBox>
 #include <QLabel>
 #include <QVBoxLayout>
 
+namespace
+{
+Qt::CheckState calculateCheckState(const std::vector<bool> &state)
+{
+    if (state.empty())
+    {
+        return Qt::CheckState::Unchecked;
+    }
+
+    bool allSelected = true;
+    bool noneSelected = true;
+
+    for (const auto &item : state)
+    {
+        if (allSelected && !item)
+        {
+            allSelected = false;
+        }
+        if (noneSelected && item)
+        {
+            noneSelected = false;
+        }
+    }
+
+    if (noneSelected)
+    {
+        return Qt::CheckState::Unchecked;
+    }
+    if (allSelected)
+    {
+        return Qt::CheckState::Checked;
+    }
+
+    return Qt::CheckState::PartiallyChecked;
+}
+
+} // namespace
+
+
 namespace app
 {
-SectorsPresetsWidget::SectorsPresetsWidget(QWidget *parent)
+SectorPresetsWidget::SectorPresetsWidget(QWidget *parent)
     : QWidget{parent}
 {
     createUI();
 }
 
 
-void SectorsPresetsWidget::setModel(app::SectorsTableModel *model)
+void SectorPresetsWidget::setModel(app::SectorTableModel *model)
 {
-    if (m_model != nullptr)
-    {
-        return;
-    }
+    assert(m_model == nullptr);
 
     m_model = model;
 
@@ -48,39 +84,13 @@ void SectorsPresetsWidget::setModel(app::SectorsTableModel *model)
 
         connect(m_model, &QAbstractItemModel::dataChanged, [this, &preset]() {
             const auto state = m_model->getItemsState(preset.sectors);
-
-            bool allSelected = true;
-            bool noneSelected = true;
-
-            for (const auto &item : state)
-            {
-                if (allSelected && !item)
-                {
-                    allSelected = false;
-                }
-                if (noneSelected && item)
-                {
-                    noneSelected = false;
-                }
-            }
-
-            auto checkState = Qt::CheckState::PartiallyChecked;
-            if (noneSelected)
-            {
-                checkState = Qt::CheckState::Unchecked;
-            }
-            if (allSelected)
-            {
-                checkState = Qt::CheckState::Checked;
-            }
-
-            preset.checkBox->setCheckState(checkState);
+            preset.checkBox->setCheckState(calculateCheckState(state));
         });
     }
 }
 
 
-void SectorsPresetsWidget::createUI()
+void SectorPresetsWidget::createUI()
 {
     auto *layout = new QVBoxLayout(this);
 
@@ -93,10 +103,10 @@ void SectorsPresetsWidget::createUI()
 
     for (const auto &copy : copies)
     {
-        auto *checkbox = new QCheckBox(copy.first, this);
-        layout->addWidget(checkbox);
+        auto *checkBox = new QCheckBox(copy.first, this);
+        layout->addWidget(checkBox);
 
-        m_presets.emplace_back(Preset{checkbox, copy.second});
+        m_presets.emplace_back(Preset{checkBox, copy.second});
     }
 }
 

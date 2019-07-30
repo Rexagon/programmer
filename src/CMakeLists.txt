@@ -1,12 +1,12 @@
 set(PROGRAMMER_SRC
-    Models/SectorsTableModel.cpp
+        Models/SectorTableModel.cpp
     Models/SerialPortListModel.cpp
 
     Widgets/BaudRateSelector.cpp
     Widgets/ConnectionWidget.cpp
     Widgets/LinkButton.cpp
-    Widgets/SectorsPresetsWidget.cpp
-    Widgets/SectorsTableWidget.cpp
+        Widgets/SectorPresetsWidget.cpp
+        Widgets/SectorTableWidget.cpp
     Widgets/SerialPortSelector.cpp
 
     Windows/MainWindow.cpp
@@ -16,14 +16,14 @@ set(PROGRAMMER_SRC
     main.cpp)
 
 set(PROGRAMMER_MOC_TARGETS
-    Models/SectorsTableModel.h
+        Models/SectorTableModel.h
     Models/SerialPortListModel.h
 
     Widgets/BaudRateSelector.h
     Widgets/ConnectionWidget.h
     Widgets/LinkButton.h
-    Widgets/SectorsPresetsWidget.h
-    Widgets/SectorsTableWidget.h
+        Widgets/SectorPresetsWidget.h
+        Widgets/SectorTableWidget.h
     Widgets/SerialPortSelector.h
 
     Windows/MainWindow.h

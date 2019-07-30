@@ -3,7 +3,7 @@
  * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
  */
 
-#include "SectorsTableWidget.h"
+#include "SectorTableWidget.h"
 
 #include <QHeaderView>
 #include <QVBoxLayout>
@@ -15,15 +15,17 @@ constexpr auto TABLE_HEIGHT_MIN = 144;
 
 namespace app
 {
-SectorsTableWidget::SectorsTableWidget(QWidget *parent)
+SectorTableWidget::SectorTableWidget(QWidget *parent)
     : QWidget{parent}
 {
     createUI();
 }
 
 
-void SectorsTableWidget::setModel(SectorsTableModel *model)
+void SectorTableWidget::setModel(SectorTableModel *model)
 {
+    assert(m_tableView->model() == nullptr);
+
     m_tableView->setModel(model);
 
     m_tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
@@ -32,7 +34,7 @@ void SectorsTableWidget::setModel(SectorsTableModel *model)
 }
 
 
-void SectorsTableWidget::createUI()
+void SectorTableWidget::createUI()
 {
     auto *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);

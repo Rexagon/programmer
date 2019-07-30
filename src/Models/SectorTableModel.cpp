@@ -3,13 +3,13 @@
  * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
  */
 
-#include "SectorsTableModel.h"
+#include "SectorTableModel.h"
 
 #include <cassert>
 
 namespace app
 {
-SectorsTableModel::SectorsTableModel(QObject *parent)
+SectorTableModel::SectorTableModel(QObject *parent)
     : QAbstractTableModel{parent}
 {
     for (int i = 0; i < 18; ++i)
@@ -24,29 +24,7 @@ SectorsTableModel::SectorsTableModel(QObject *parent)
 }
 
 
-void SectorsTableModel::selectAll()
-{
-    for (auto &sector : m_sectors)
-    {
-        sector.selected = true;
-    }
-
-    emit dataChanged(index(0, 0), index(m_sectors.size(), 2));
-}
-
-
-void SectorsTableModel::deselectAll()
-{
-    for (auto &sector : m_sectors)
-    {
-        sector.selected = true;
-    }
-
-    emit dataChanged(index(0, 0), index(m_sectors.size(), 2));
-}
-
-
-void SectorsTableModel::setItemsSelected(const std::vector<int> &items, bool selected)
+void SectorTableModel::setItemsSelected(const std::vector<int> &items, bool selected)
 {
     for (const auto &item : items)
     {
@@ -59,7 +37,7 @@ void SectorsTableModel::setItemsSelected(const std::vector<int> &items, bool sel
 }
 
 
-std::vector<bool> SectorsTableModel::getItemsState(const std::vector<int> &items)
+std::vector<bool> SectorTableModel::getItemsState(const std::vector<int> &items)
 {
     std::vector<bool> result;
     result.reserve(items.size());
@@ -73,7 +51,7 @@ std::vector<bool> SectorsTableModel::getItemsState(const std::vector<int> &items
 }
 
 
-Qt::ItemFlags SectorsTableModel::flags(const QModelIndex &index) const
+Qt::ItemFlags SectorTableModel::flags(const QModelIndex &index) const
 {
     if (index.column() == 2)
     {
@@ -84,19 +62,43 @@ Qt::ItemFlags SectorsTableModel::flags(const QModelIndex &index) const
 }
 
 
-int SectorsTableModel::rowCount(const QModelIndex & /*parent*/) const
+int SectorTableModel::rowCount(const QModelIndex & /*parent*/) const
 {
     return m_sectors.size();
 }
 
 
-int SectorsTableModel::columnCount(const QModelIndex & /*parent*/) const
+int SectorTableModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return 3;
 }
 
 
-QVariant SectorsTableModel::data(const QModelIndex &index, int role) const
+QVariant SectorTableModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (role == Qt::DisplayRole && orientation == Qt::Orientation::Horizontal)
+    {
+        switch (section)
+        {
+            case 0:
+                return QString("Сектор");
+
+            case 1:
+                return QString("Размер");
+
+            case 2:
+                return {};
+
+            default:
+                break;
+        }
+    }
+
+    return QAbstractTableModel::headerData(section, orientation, role);
+}
+
+
+QVariant SectorTableModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
     {
@@ -118,19 +120,18 @@ QVariant SectorsTableModel::data(const QModelIndex &index, int role) const
         }
     }
 
-    if (index.column() == 2 && role == Qt::CheckStateRole)
+    if (role == Qt::CheckStateRole && index.column() == 2)
     {
         return m_sectors[index.row()].selected ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
     }
-
 
     return {};
 }
 
 
-bool SectorsTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool SectorTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (index.column() == 2 && role == Qt::CheckStateRole)
+    if (role == Qt::CheckStateRole && index.column() == 2)
     {
         m_sectors[index.row()].selected = value.value<bool>();
 
@@ -139,30 +140,6 @@ bool SectorsTableModel::setData(const QModelIndex &index, const QVariant &value,
     }
 
     return QAbstractItemModel::setData(index, value, role);
-}
-
-
-QVariant SectorsTableModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    if (role == Qt::DisplayRole && orientation == Qt::Orientation::Horizontal)
-    {
-        switch (section)
-        {
-            case 0:
-                return QString("Сектор");
-
-            case 1:
-                return QString("Размер");
-
-            case 2:
-                return {};
-
-            default:
-                break;
-        }
-    }
-
-    return QAbstractTableModel::headerData(section, orientation, role);
 }
 
 } // namespace app

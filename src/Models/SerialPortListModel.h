@@ -17,10 +17,11 @@ public:
 
     bool isEmpty() const;
 
-private:
+protected:
     int rowCount(const QModelIndex &parent) const override;
     QVariant data(const QModelIndex &index, int role) const override;
 
+private:
     QList<QSerialPortInfo> m_serialPorts{};
 };
 

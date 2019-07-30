@@ -9,8 +9,8 @@
 #include "General.h"
 #include "Widgets/ConnectionWidget.h"
 #include "Widgets/LinkButton.h"
-#include "Widgets/SectorsPresetsWidget.h"
-#include "Widgets/SectorsTableWidget.h"
+#include "Widgets/SectorPresetsWidget.h"
+#include "Widgets/SectorTableWidget.h"
 
 namespace app
 {
@@ -25,7 +25,7 @@ public:
 
     void setApplicationState(ApplicationState state);
 
-    void setSectorsTableModel(SectorsTableModel *model);
+    void setSectorsTableModel(SectorTableModel *model);
 
     ConnectionWidget *getConnectionWidget() const;
 
@@ -51,8 +51,8 @@ private:
     ConnectionWidget *m_connectionWidget = nullptr;
 
     QStackedWidget *m_sectorsSelectionWrapper = nullptr;
-    SectorsPresetsWidget *m_sectorsPresets = nullptr;
-    SectorsTableWidget *m_sectorsTable = nullptr;
+    SectorPresetsWidget *m_sectorPresets = nullptr;
+    SectorTableWidget *m_sectorTable = nullptr;
 
     LinkButton *m_viewModeToggle = nullptr;
 

@@ -65,10 +65,10 @@ void MainWindowUI::setApplicationState(ApplicationState state)
 }
 
 
-void MainWindowUI::setSectorsTableModel(SectorsTableModel *model)
+void MainWindowUI::setSectorsTableModel(SectorTableModel *model)
 {
-    m_sectorsPresets->setModel(model);
-    m_sectorsTable->setModel(model);
+    m_sectorPresets->setModel(model);
+    m_sectorTable->setModel(model);
 }
 
 
@@ -113,8 +113,6 @@ QWidget *MainWindowUI::createTopWorkspace()
     auto *container = new QWidget(m_window);
     auto *layout = new QVBoxLayout(container);
 
-    //container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
     // Serial port selector
     m_connectionWidget = new ConnectionWidget(m_window);
     layout->addWidget(m_connectionWidget);
@@ -128,8 +126,8 @@ QWidget *MainWindowUI::createTopWorkspace()
     auto *sectorPresetsContainer = new QWidget(m_window);
     auto *sectorPresetsLayout = new QVBoxLayout(sectorPresetsContainer);
 
-    m_sectorsPresets = new SectorsPresetsWidget(m_window);
-    sectorPresetsLayout->addWidget(m_sectorsPresets);
+    m_sectorPresets = new SectorPresetsWidget(m_window);
+    sectorPresetsLayout->addWidget(m_sectorPresets);
     sectorPresetsLayout->addStretch();
 
     m_sectorsSelectionWrapper->addWidget(sectorPresetsContainer);
@@ -138,8 +136,8 @@ QWidget *MainWindowUI::createTopWorkspace()
     auto *sectorsTableContainer = new QWidget(m_window);
     auto *sectorsTableLayout = new QVBoxLayout(sectorsTableContainer);
 
-    m_sectorsTable = new SectorsTableWidget(m_window);
-    sectorsTableLayout->addWidget(m_sectorsTable);
+    m_sectorTable = new SectorTableWidget(m_window);
+    sectorsTableLayout->addWidget(m_sectorTable);
 
     m_sectorsSelectionWrapper->addWidget(sectorsTableContainer);
 

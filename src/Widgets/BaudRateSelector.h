@@ -11,8 +11,6 @@ class BaudRateSelector : public QComboBox
 
 public:
     explicit BaudRateSelector(QWidget *parent = nullptr);
-
-private:
 };
 
 } // namespace app
