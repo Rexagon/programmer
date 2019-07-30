@@ -30,7 +30,51 @@ void SectorsPresetsWidget::setModel(app::SectorsTableModel *model)
     for (auto &preset : m_presets)
     {
         connect(preset.checkBox, &QCheckBox::stateChanged, [this, &preset](int state) {
-            m_model->setItemsSelected(preset.sectors, state == Qt::CheckState::Checked);
+            switch (state)
+            {
+                case Qt::CheckState::Checked:
+                    m_model->setItemsSelected(preset.sectors, true);
+                    break;
+
+                case Qt::CheckState::Unchecked:
+                    m_model->setItemsSelected(preset.sectors, false);
+                    preset.checkBox->setTristate(false);
+                    break;
+
+                default:
+                    break;
+            }
+        });
+
+        connect(m_model, &QAbstractItemModel::dataChanged, [this, &preset]() {
+            const auto state = m_model->getItemsState(preset.sectors);
+
+            bool allSelected = true;
+            bool noneSelected = true;
+
+            for (const auto &item : state)
+            {
+                if (allSelected && !item)
+                {
+                    allSelected = false;
+                }
+                if (noneSelected && item)
+                {
+                    noneSelected = false;
+                }
+            }
+
+            auto checkState = Qt::CheckState::PartiallyChecked;
+            if (noneSelected)
+            {
+                checkState = Qt::CheckState::Unchecked;
+            }
+            if (allSelected)
+            {
+                checkState = Qt::CheckState::Checked;
+            }
+
+            preset.checkBox->setCheckState(checkState);
         });
     }
 }

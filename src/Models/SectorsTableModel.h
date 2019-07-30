@@ -22,6 +22,7 @@ public:
     void deselectAll();
 
     void setItemsSelected(const std::vector<int> &items, bool selected);
+    std::vector<bool> getItemsState(const std::vector<int>& items);
 
 private:
     Qt::ItemFlags flags(const QModelIndex &index) const override;

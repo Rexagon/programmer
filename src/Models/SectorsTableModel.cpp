@@ -5,6 +5,8 @@
 
 #include "SectorsTableModel.h"
 
+#include <cassert>
+
 namespace app
 {
 SectorsTableModel::SectorsTableModel(QObject *parent)
@@ -18,7 +20,7 @@ SectorsTableModel::SectorsTableModel(QObject *parent)
     m_sectors[0].size = 16;
     m_sectors[1].size = 8;
     m_sectors[2].size = 8;
-    m_sectors[4].size = 32;
+    m_sectors[3].size = 32;
 }
 
 
@@ -48,13 +50,26 @@ void SectorsTableModel::setItemsSelected(const std::vector<int> &items, bool sel
 {
     for (const auto &item : items)
     {
-        if (item < m_sectors.size())
-        {
-            m_sectors[item].selected = selected;
-        }
+        assert(item < m_sectors.size());
+
+        m_sectors[item].selected = selected;
     }
 
     emit dataChanged(index(0, 0), index(m_sectors.size(), 2));
+}
+
+
+std::vector<bool> SectorsTableModel::getItemsState(const std::vector<int> &items)
+{
+    std::vector<bool> result;
+    result.reserve(items.size());
+
+    for (const auto &item : items)
+    {
+        result.emplace_back(m_sectors[item].selected);
+    }
+
+    return result;
 }
 
 
@@ -118,6 +133,8 @@ bool SectorsTableModel::setData(const QModelIndex &index, const QVariant &value,
     if (index.column() == 2 && role == Qt::CheckStateRole)
     {
         m_sectors[index.row()].selected = value.value<bool>();
+
+        emit dataChanged(index, index);
         return true;
     }
 
