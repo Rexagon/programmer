@@ -5,7 +5,9 @@
 
 #include "MainWindow.h"
 
-#include <QFileDialog>
+#include <iostream>
+
+#include "ProgrammingDialog.h"
 
 namespace
 {
@@ -25,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent)
     , m_connectionState{DEFAULT_CONNECTION_STATE}
     , m_applicationState{DEFAULT_APPLICATION_STATE}
 {
+    createFileDialog();
+
     syncState();
     m_ui.setSectorsTableModel(&m_sectorsTableModel);
 
@@ -57,8 +61,12 @@ void MainWindow::connectSignals()
     });
 
     connect(m_ui.getWriteButton(), &QPushButton::clicked, [this]() {
-        const auto memoryFile =
-            QFileDialog::getOpenFileName(this, "Выберите файл прошивки", QDir::currentPath(), FILE_DIALOG_PATTERN);
+        m_fileDialog->open();
+    });
+
+    connect(m_fileDialog, &QFileDialog::fileSelected, [this](const QString &file) {
+        auto *progrmmingDialog = new ProgrammingDialog{file, this};
+        progrmmingDialog->open();
     });
 }
 
@@ -68,6 +76,14 @@ void MainWindow::syncState()
     m_ui.setViewMode(m_viewMode);
     m_ui.setConnectionState(m_connectionState);
     m_ui.setApplicationState(m_applicationState);
+}
+
+
+void MainWindow::createFileDialog()
+{
+    m_fileDialog = new QFileDialog(this);
+    m_fileDialog->setFileMode(QFileDialog::AnyFile);
+    m_fileDialog->setNameFilter(FILE_DIALOG_PATTERN);
 }
 
 } // namespace app
