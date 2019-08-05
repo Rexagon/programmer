@@ -6,9 +6,11 @@
 
 namespace app
 {
-Operation::Operation(const QString &name)
-    : m_name{name}
+Operation::Operation(SectorTableModel *model, const QString &name)
+    : m_model{model}
+    , m_name{name}
 {
+    assert(m_model != nullptr);
 }
 
 
@@ -16,5 +18,12 @@ const QString &Operation::getName() const
 {
     return m_name;
 }
+
+
+SectorTableModel *Operation::getModel() const
+{
+    return m_model;
+}
+
 
 } // namespace app

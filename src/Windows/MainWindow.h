@@ -32,6 +32,8 @@ private:
 
     void runOperation(std::unique_ptr<Operation> operation);
 
+    std::function<void()> selectFileOnce(const std::function<void(const QString&)> &cb);
+
     MainWindowUI m_ui;
 
     ViewMode m_viewMode;

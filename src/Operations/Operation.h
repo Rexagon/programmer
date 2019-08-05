@@ -6,6 +6,8 @@
 #include <QObject>
 #include <QString>
 
+#include "Models/SectorTableModel.h"
+
 namespace app
 {
 class Operation : public QObject
@@ -13,9 +15,9 @@ class Operation : public QObject
     Q_OBJECT
 
 public:
-    explicit Operation(const QString &name);
+    explicit Operation(SectorTableModel *model, const QString &name);
 
-    virtual std::optional<QString> check() = 0;
+    virtual std::optional<QString> validate() = 0;
 
     virtual void run() = 0;
 
@@ -23,11 +25,21 @@ public:
 
     virtual QString getDescription() const = 0;
 
+    Operation(const Operation &) = delete;
+    Operation &operator=(const Operation &) = delete;
+    Operation(Operation &&) noexcept = delete;
+    Operation &operator=(Operation &&) noexcept = delete;
+
 signals:
     void notifyProgress(int progress, const QString &description = "");
     void notifyComplete(bool success = true);
 
+protected:
+    SectorTableModel *getModel() const;
+
 private:
+    SectorTableModel *m_model = nullptr;
+
     QString m_name;
 };
 

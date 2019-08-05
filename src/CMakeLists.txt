@@ -4,6 +4,7 @@ set(PROGRAMMER_SRC
 
     Operations/Operation.cpp
     Operations/Program.cpp
+        Operations/Verify.cpp
 
     Widgets/BaudRateSelector.cpp
     Widgets/ConnectionWidget.cpp
@@ -17,7 +18,8 @@ set(PROGRAMMER_SRC
     Windows/OperationDialog.cpp
 
     General.cpp
-    main.cpp)
+    main.cpp
+)
 
 set(PROGRAMMER_MOC_TARGETS
     Models/SectorTableModel.h
@@ -25,6 +27,7 @@ set(PROGRAMMER_MOC_TARGETS
 
     Operations/Operation.h
     Operations/Program.h
+        Operations/Verify.h
 
     Widgets/BaudRateSelector.h
     Widgets/ConnectionWidget.h

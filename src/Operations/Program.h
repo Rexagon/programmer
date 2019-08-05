@@ -13,20 +13,13 @@ class Program final : public Operation
 public:
     explicit Program(SectorTableModel *model, const QString &fileName);
 
-    std::optional<QString> check() override;
+    std::optional<QString> validate() override;
 
     void run() override;
 
     QString getDescription() const override;
 
-    Program(const Program &) = delete;
-    Program &operator=(const Program &) = delete;
-    Program(Program &&) noexcept = delete;
-    Program &operator=(Program &&) noexcept = delete;
-
 private:
-    SectorTableModel *m_model = nullptr;
-
     QString m_fileName;
 };
 

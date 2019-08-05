@@ -11,6 +11,7 @@
 
 #include "OperationDialog.h"
 #include "Operations/Program.h"
+#include "Operations/Verify.h"
 
 namespace
 {
@@ -41,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::connectSignals()
 {
-    connect(m_ui.getConnectionWidget(), &ConnectionWidget::connectionRequest, [this]() {
+    connect(m_ui.getConnectionWidget(), &ConnectionWidget::connectionRequest, [this] {
         m_connectionState = ConnectionState::CONNECTING;
         syncState();
 
@@ -52,21 +53,24 @@ void MainWindow::connectSignals()
         syncState();
     });
 
-    connect(m_ui.getConnectionWidget(), &ConnectionWidget::disconnectionRequest, [this]() {
+    connect(m_ui.getConnectionWidget(), &ConnectionWidget::disconnectionRequest, [this] {
         m_connectionState = ConnectionState::DISCONNECTED;
         m_applicationState = ApplicationState::DISCONNECTED;
         syncState();
     });
 
-    connect(m_ui.getViewModeToggle(), &LinkButton::clicked, [this]() {
+    connect(m_ui.getViewModeToggle(), &LinkButton::clicked, [this] {
         m_viewMode = !m_viewMode;
         m_ui.setViewMode(m_viewMode);
     });
 
-    connect(m_ui.getWriteButton(), &QPushButton::clicked, [this]() { m_fileDialog->open(); });
+    connect(m_ui.getWriteButton(), &QPushButton::clicked, selectFileOnce([this](const QString &file) {
+                runOperation(std::make_unique<Program>(&m_sectorsTableModel, file));
+            }));
 
-    connect(m_fileDialog, &QFileDialog::fileSelected,
-            [this](const QString &file) { runOperation(std::make_unique<Program>(&m_sectorsTableModel, file)); });
+    connect(m_ui.getVerifyButton(), &QPushButton::clicked, selectFileOnce([this](const QString &file) {
+                runOperation(std::make_unique<Verify>(&m_sectorsTableModel, file));
+            }));
 }
 
 
@@ -88,7 +92,7 @@ void MainWindow::createFileDialog()
 
 void MainWindow::runOperation(std::unique_ptr<Operation> operation)
 {
-    const auto error = operation->check();
+    const auto error = operation->validate();
 
     if (error)
     {
@@ -99,6 +103,19 @@ void MainWindow::runOperation(std::unique_ptr<Operation> operation)
 
     auto *dialog = new OperationDialog(std::move(operation), this);
     dialog->open();
+}
+
+
+std::function<void()> MainWindow::selectFileOnce(const std::function<void(const QString &)> &cb)
+{
+    return [this, cb] {
+        connect(m_fileDialog, &QFileDialog::fileSelected, [this, cb](const QString &file) {
+            m_fileDialog->disconnect();
+            cb(file);
+        });
+
+        m_fileDialog->open();
+    };
 }
 
 } // namespace app
