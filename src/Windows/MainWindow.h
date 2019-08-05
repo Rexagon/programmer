@@ -1,10 +1,13 @@
 #ifndef PROGRAMMER_MAINWINDOW_H
 #define PROGRAMMER_MAINWINDOW_H
 
+#include <memory>
+
 #include <QFileDialog>
 
 #include "MainWindowUI.h"
 #include "Models/SectorTableModel.h"
+#include "Operations/Operation.h"
 
 namespace app
 {
@@ -26,6 +29,8 @@ private:
     void connectSignals();
 
     void syncState();
+
+    void runOperation(std::unique_ptr<Operation> operation);
 
     MainWindowUI m_ui;
 

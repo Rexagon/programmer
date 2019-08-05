@@ -152,6 +152,7 @@ QWidget *MainWindowUI::createBottomWorkspace()
     auto *layout = new QVBoxLayout(container);
 
     layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
     // View mode toggle
     auto *viewModeContainer = new QWidget(m_window);

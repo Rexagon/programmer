@@ -37,7 +37,7 @@ void SectorTableModel::setItemsSelected(const std::vector<int> &items, bool sele
 }
 
 
-std::vector<bool> SectorTableModel::getItemsState(const std::vector<int> &items)
+std::vector<bool> SectorTableModel::getItemsState(const std::vector<int> &items) const
 {
     std::vector<bool> result;
     result.reserve(items.size());
@@ -45,6 +45,20 @@ std::vector<bool> SectorTableModel::getItemsState(const std::vector<int> &items)
     for (const auto &item : items)
     {
         result.emplace_back(m_sectors[item].selected);
+    }
+
+    return result;
+}
+
+
+std::vector<bool> SectorTableModel::getItemsState() const
+{
+    std::vector<bool> result;
+    result.reserve(static_cast<size_t>(m_sectors.size()));
+
+    for (const auto &sector : m_sectors)
+    {
+        result.emplace_back(sector.selected);
     }
 
     return result;

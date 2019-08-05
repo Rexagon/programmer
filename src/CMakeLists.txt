@@ -2,6 +2,9 @@ set(PROGRAMMER_SRC
     Models/SectorTableModel.cpp
     Models/SerialPortListModel.cpp
 
+    Operations/Operation.cpp
+    Operations/Program.cpp
+
     Widgets/BaudRateSelector.cpp
     Widgets/ConnectionWidget.cpp
     Widgets/LinkButton.cpp
@@ -11,7 +14,7 @@ set(PROGRAMMER_SRC
 
     Windows/MainWindow.cpp
     Windows/MainWindowUI.cpp
-    Windows/ProgrammingDialog.cpp
+    Windows/OperationDialog.cpp
 
     General.cpp
     main.cpp)
@@ -19,6 +22,9 @@ set(PROGRAMMER_SRC
 set(PROGRAMMER_MOC_TARGETS
     Models/SectorTableModel.h
     Models/SerialPortListModel.h
+
+    Operations/Operation.h
+    Operations/Program.h
 
     Widgets/BaudRateSelector.h
     Widgets/ConnectionWidget.h
@@ -28,7 +34,7 @@ set(PROGRAMMER_MOC_TARGETS
     Widgets/SerialPortSelector.h
 
     Windows/MainWindow.h
-    Windows/ProgrammingDialog.h
+    Windows/OperationDialog.h
 )
 
 add_executable(programmer ${PROGRAMMER_SRC} ${PROGRAMMER_MOC_TARGETS})

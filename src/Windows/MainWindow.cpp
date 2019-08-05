@@ -7,7 +7,10 @@
 
 #include <iostream>
 
-#include "ProgrammingDialog.h"
+#include <QMessageBox>
+
+#include "OperationDialog.h"
+#include "Operations/Program.h"
 
 namespace
 {
@@ -60,14 +63,10 @@ void MainWindow::connectSignals()
         m_ui.setViewMode(m_viewMode);
     });
 
-    connect(m_ui.getWriteButton(), &QPushButton::clicked, [this]() {
-        m_fileDialog->open();
-    });
+    connect(m_ui.getWriteButton(), &QPushButton::clicked, [this]() { m_fileDialog->open(); });
 
-    connect(m_fileDialog, &QFileDialog::fileSelected, [this](const QString &file) {
-        auto *progrmmingDialog = new ProgrammingDialog{file, this};
-        progrmmingDialog->open();
-    });
+    connect(m_fileDialog, &QFileDialog::fileSelected,
+            [this](const QString &file) { runOperation(std::make_unique<Program>(&m_sectorsTableModel, file)); });
 }
 
 
@@ -84,6 +83,22 @@ void MainWindow::createFileDialog()
     m_fileDialog = new QFileDialog(this);
     m_fileDialog->setFileMode(QFileDialog::AnyFile);
     m_fileDialog->setNameFilter(FILE_DIALOG_PATTERN);
+}
+
+
+void MainWindow::runOperation(std::unique_ptr<Operation> operation)
+{
+    const auto error = operation->validate();
+
+    if (error)
+    {
+        QMessageBox::critical(this, "Ошибка", *error);
+        activateWindow();
+        return;
+    }
+
+    auto *dialog = new OperationDialog(std::move(operation), this);
+    dialog->open();
 }
 
 } // namespace app

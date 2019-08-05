@@ -19,7 +19,8 @@ public:
     explicit SectorTableModel(QObject *parent = nullptr);
 
     void setItemsSelected(const std::vector<int> &items, bool selected);
-    std::vector<bool> getItemsState(const std::vector<int> &items);
+    std::vector<bool> getItemsState(const std::vector<int> &items) const;
+    std::vector<bool> getItemsState() const;
 
 protected:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
