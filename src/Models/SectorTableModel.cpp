@@ -13,9 +13,9 @@ SectorTableModel::SectorTableModel(QObject *parent)
     : QAbstractTableModel{parent}
 {
     // Создаём сектора
-    for (int i = 0; i < 19; ++i)
+    for (size_t i = 0; i < 19; ++i)
     {
-        m_sectors.append(Sector{64, 0, false});
+        m_sectors.append(Sector{i, 64, 0, false});
     }
 
     m_sectors[0].size = 16;
@@ -42,32 +42,32 @@ void SectorTableModel::setItemsSelected(const std::vector<int> &items, bool sele
         m_sectors[item].selected = selected;
     }
 
-    emit dataChanged(index(0, 0), index(m_sectors.size(), 2));
+    emit dataChanged(index(0, 0), index(m_sectors.size(), Column::LAST));
 }
 
 
-std::vector<bool> SectorTableModel::getItemsState(const std::vector<int> &items) const
+std::vector<SectorTableModel::Sector> SectorTableModel::getItems(const std::vector<int> &items) const
 {
-    std::vector<bool> result;
+    std::vector<Sector> result;
     result.reserve(items.size());
 
     for (const auto &item : items)
     {
-        result.emplace_back(m_sectors[item].selected);
+        result.emplace_back(m_sectors[item]);
     }
 
     return result;
 }
 
 
-std::vector<bool> SectorTableModel::getItemsState() const
+std::vector<SectorTableModel::Sector> SectorTableModel::getItems() const
 {
-    std::vector<bool> result;
+    std::vector<Sector> result;
     result.reserve(static_cast<size_t>(m_sectors.size()));
 
     for (const auto &sector : m_sectors)
     {
-        result.emplace_back(sector.selected);
+        result.emplace_back(sector);
     }
 
     return result;
@@ -76,7 +76,7 @@ std::vector<bool> SectorTableModel::getItemsState() const
 
 Qt::ItemFlags SectorTableModel::flags(const QModelIndex &index) const
 {
-    if (index.column() == 3)
+    if (index.column() == Column::CHECKBOX)
     {
         return QAbstractTableModel::flags(index) | Qt::ItemIsUserCheckable;
     }
@@ -93,7 +93,7 @@ int SectorTableModel::rowCount(const QModelIndex & /*parent*/) const
 
 int SectorTableModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 4;
+    return Column::COUNT;
 }
 
 
@@ -103,13 +103,13 @@ QVariant SectorTableModel::headerData(int section, Qt::Orientation orientation, 
     {
         switch (section)
         {
-            case 0:
+            case Column::NAME:
                 return QString("Сектор");
 
-            case 1:
+            case Column::SIZE:
                 return QString("Размер");
 
-            case 2:
+            case Column::ADDRESS:
                 return QString("Адреса");
 
             default:
@@ -132,13 +132,13 @@ QVariant SectorTableModel::data(const QModelIndex &index, int role) const
     {
         switch (index.column())
         {
-            case 0:
+            case Column::NAME:
                 return QString("SA%1").arg(index.row());
 
-            case 1:
+            case Column::SIZE:
                 return QString("%1 KБ").arg(m_sectors[index.row()].size);
 
-            case 2:
+            case Column::ADDRESS:
             {
                 const auto sector = m_sectors[index.row()];
                 return QString("%1h-%2h")
@@ -151,7 +151,7 @@ QVariant SectorTableModel::data(const QModelIndex &index, int role) const
         }
     }
 
-    if (role == Qt::CheckStateRole && index.column() == 3)
+    if (role == Qt::CheckStateRole && index.column() == Column::CHECKBOX)
     {
         return m_sectors[index.row()].selected ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
     }
@@ -162,7 +162,7 @@ QVariant SectorTableModel::data(const QModelIndex &index, int role) const
 
 bool SectorTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (role == Qt::CheckStateRole && index.column() == 3)
+    if (role == Qt::CheckStateRole && index.column() == Column::CHECKBOX)
     {
         m_sectors[index.row()].selected = value.value<bool>();
 

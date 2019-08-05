@@ -19,15 +19,15 @@ Program::Program(SectorTableModel *model, const QString &fileName)
 }
 
 
-std::optional<QString> Program::validate()
+std::optional<QString> Program::check()
 {
     assert(m_model != nullptr);
 
     bool hasSelectedSectors = false;
-    const auto selectedSectors = m_model->getItemsState();
-    for (const auto &selection : selectedSectors)
+    const auto sectors = m_model->getItems();
+    for (const auto &sector : sectors)
     {
-        if (selection)
+        if (sector.selected)
         {
             hasSelectedSectors = true;
             break;
@@ -64,12 +64,12 @@ QString Program::getDescription() const
 {
     assert(m_model != nullptr);
 
-    const auto selectedSectors = m_model->getItemsState();
+    const auto sectors = m_model->getItems();
     QString selectedSectorsString = "";
 
-    for (size_t i = 0; i < selectedSectors.size(); ++i)
+    for (const auto &sector : sectors)
     {
-        if (!selectedSectors[i])
+        if (!sector.selected)
         {
             continue;
         }
@@ -79,7 +79,7 @@ QString Program::getDescription() const
             selectedSectorsString += ", ";
         }
 
-        selectedSectorsString += QString("SA%1").arg(i);
+        selectedSectorsString += QString("SA%1").arg(sector.number);
     }
 
     return QString("Запись файла:\n\t%1\nВ секторы:\n\t%2").arg(m_fileName, selectedSectorsString);

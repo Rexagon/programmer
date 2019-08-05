@@ -15,7 +15,7 @@ class Operation : public QObject
 public:
     explicit Operation(const QString &name);
 
-    virtual std::optional<QString> validate() = 0;
+    virtual std::optional<QString> check() = 0;
 
     virtual void run() = 0;
 

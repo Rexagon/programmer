@@ -13,7 +13,7 @@ class Program final : public Operation
 public:
     explicit Program(SectorTableModel *model, const QString &fileName);
 
-    std::optional<QString> validate() override;
+    std::optional<QString> check() override;
 
     void run() override;
 

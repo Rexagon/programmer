@@ -88,7 +88,7 @@ void MainWindow::createFileDialog()
 
 void MainWindow::runOperation(std::unique_ptr<Operation> operation)
 {
-    const auto error = operation->validate();
+    const auto error = operation->check();
 
     if (error)
     {

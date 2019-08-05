@@ -11,7 +11,7 @@
 
 namespace
 {
-Qt::CheckState calculateCheckState(const std::vector<bool> &state)
+Qt::CheckState calculateCheckState(const std::vector<app::SectorTableModel::Sector> &state)
 {
     if (state.empty())
     {
@@ -23,11 +23,11 @@ Qt::CheckState calculateCheckState(const std::vector<bool> &state)
 
     for (const auto &item : state)
     {
-        if (allSelected && !item)
+        if (allSelected && !item.selected)
         {
             allSelected = false;
         }
-        if (noneSelected && item)
+        if (noneSelected && item.selected)
         {
             noneSelected = false;
         }
@@ -83,7 +83,7 @@ void SectorPresetsWidget::setModel(app::SectorTableModel *model)
         });
 
         connect(m_model, &QAbstractItemModel::dataChanged, [this, &preset]() {
-            const auto state = m_model->getItemsState(preset.sectors);
+            const auto state = m_model->getItems(preset.sectors);
             preset.checkBox->setCheckState(calculateCheckState(state));
         });
     }
