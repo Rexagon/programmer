@@ -12,15 +12,24 @@ namespace app
 SectorTableModel::SectorTableModel(QObject *parent)
     : QAbstractTableModel{parent}
 {
-    for (int i = 0; i < 18; ++i)
+    // Создаём сектора
+    for (int i = 0; i < 19; ++i)
     {
-        m_sectors.append(Sector{64, false});
+        m_sectors.append(Sector{64, 0, false});
     }
 
     m_sectors[0].size = 16;
     m_sectors[1].size = 8;
     m_sectors[2].size = 8;
     m_sectors[3].size = 32;
+
+    // Заполняем адреса секторов
+    size_t currentAddress = 0;
+    for (auto &sector : m_sectors)
+    {
+        sector.address = currentAddress;
+        currentAddress += sector.size;
+    }
 }
 
 
@@ -67,7 +76,7 @@ std::vector<bool> SectorTableModel::getItemsState() const
 
 Qt::ItemFlags SectorTableModel::flags(const QModelIndex &index) const
 {
-    if (index.column() == 2)
+    if (index.column() == 3)
     {
         return QAbstractTableModel::flags(index) | Qt::ItemIsUserCheckable;
     }
@@ -84,7 +93,7 @@ int SectorTableModel::rowCount(const QModelIndex & /*parent*/) const
 
 int SectorTableModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 3;
+    return 4;
 }
 
 
@@ -101,10 +110,10 @@ QVariant SectorTableModel::headerData(int section, Qt::Orientation orientation, 
                 return QString("Размер");
 
             case 2:
-                return {};
+                return QString("Адреса");
 
             default:
-                break;
+                return {};
         }
     }
 
@@ -129,12 +138,20 @@ QVariant SectorTableModel::data(const QModelIndex &index, int role) const
             case 1:
                 return QString("%1 KБ").arg(m_sectors[index.row()].size);
 
+            case 2:
+            {
+                const auto sector = m_sectors[index.row()];
+                return QString("%1h-%2h")
+                    .arg(QString::number(sector.address * 1024, 16), 6, '0')
+                    .arg(QString::number((sector.address + sector.size) * 1024 - 1, 16), 6, '0');
+            }
+
             default:
                 break;
         }
     }
 
-    if (role == Qt::CheckStateRole && index.column() == 2)
+    if (role == Qt::CheckStateRole && index.column() == 3)
     {
         return m_sectors[index.row()].selected ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
     }
@@ -145,7 +162,7 @@ QVariant SectorTableModel::data(const QModelIndex &index, int role) const
 
 bool SectorTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (role == Qt::CheckStateRole && index.column() == 2)
+    if (role == Qt::CheckStateRole && index.column() == 3)
     {
         m_sectors[index.row()].selected = value.value<bool>();
 

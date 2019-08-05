@@ -97,6 +97,8 @@ void OperationDialog::createConfirmationTab()
     confirmationLayout->addWidget(contentContainer);
     // Content end
 
+    confirmationLayout->addStretch();
+
     // Actions separator
     auto *actionsSeparator = new QFrame;
     actionsSeparator->setFrameShape(QFrame::HLine);

@@ -30,7 +30,8 @@ void SectorTableWidget::setModel(SectorTableModel *model)
 
     m_tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     m_tableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-    m_tableView->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    m_tableView->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+    m_tableView->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
 }
 
 

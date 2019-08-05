@@ -11,7 +11,7 @@
 
 namespace
 {
-constexpr auto WINDOW_WIDTH_MIN = 250;
+constexpr auto WINDOW_WIDTH_MIN = 275;
 }
 
 namespace app

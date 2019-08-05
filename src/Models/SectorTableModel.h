@@ -13,6 +13,7 @@ public:
     struct Sector
     {
         size_t size;
+        size_t address;
         bool selected;
     };
 
