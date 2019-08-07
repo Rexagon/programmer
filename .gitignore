@@ -4,5 +4,6 @@
 
 build
 CMakeFiles
+cmakefiles_*
 
 cmake-build-*
