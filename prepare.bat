@@ -1,5 +1,7 @@
 @echo off
 
+call clean.bat
+
 git submodule init
 git submodule update
 

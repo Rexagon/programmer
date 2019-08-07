@@ -1,7 +1,5 @@
 @echo off
 
-call clean.bat
-
 PUSHD %CD%
 call prepare.bat
 POPD

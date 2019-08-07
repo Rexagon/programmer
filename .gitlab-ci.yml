@@ -1,0 +1,15 @@
+stages:
+  - build
+
+.submodule_base: &submodule
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+
+build:
+  <<: *submodule
+  stage: build
+  script:
+    - sh build.sh
+  artifacts:
+    paths:
+      - build
