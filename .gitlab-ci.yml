@@ -5,9 +5,11 @@ stages:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
 
-build:
+build_develop:
   <<: *submodule
   stage: build
+  only:
+    - develop
   script:
     - sh build.sh
   artifacts:
