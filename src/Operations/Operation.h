@@ -35,12 +35,11 @@ signals:
     void notifyComplete(bool success = true);
 
 protected:
-    SectorTableModel *getModel() const;
+    const std::vector<SectorTableModel::Sector> &getSelectedSectors() const;
 
 private:
-    SectorTableModel *m_model = nullptr;
-
     QString m_name;
+    std::vector<SectorTableModel::Sector> m_selectedSectors;
 };
 
 } // namespace app

@@ -74,6 +74,21 @@ std::vector<SectorTableModel::Sector> SectorTableModel::getItems() const
 }
 
 
+std::vector<SectorTableModel::Sector> SectorTableModel::getSelectedItems() const
+{
+    std::vector<Sector> result;
+    for (const auto &sector : m_sectors)
+    {
+        if (sector.selected)
+        {
+            result.emplace_back(sector);
+        }
+    }
+
+    return result;
+}
+
+
 Qt::ItemFlags SectorTableModel::flags(const QModelIndex &index) const
 {
     if (index.column() == Column::CHECKBOX)

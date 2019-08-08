@@ -7,10 +7,9 @@
 namespace app
 {
 Operation::Operation(SectorTableModel *model, const QString &name)
-    : m_model{model}
-    , m_name{name}
+    : m_name{name}
+    , m_selectedSectors{(assert(model != nullptr), model->getSelectedItems())}
 {
-    assert(m_model != nullptr);
 }
 
 
@@ -20,10 +19,9 @@ const QString &Operation::getName() const
 }
 
 
-SectorTableModel *Operation::getModel() const
+const std::vector<SectorTableModel::Sector> &Operation::getSelectedSectors() const
 {
-    return m_model;
+    return m_selectedSectors;
 }
-
 
 } // namespace app

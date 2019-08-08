@@ -10,6 +10,7 @@
 #include <QMessageBox>
 
 #include "OperationDialog.h"
+#include <Operations/Clear.h>
 #include "Operations/Program.h"
 #include "Operations/Verify.h"
 
@@ -71,6 +72,10 @@ void MainWindow::connectSignals()
     connect(m_ui.getVerifyButton(), &QPushButton::clicked, selectFileOnce([this](const QString &file) {
                 runOperation(std::make_unique<Verify>(&m_sectorsTableModel, file));
             }));
+
+    connect(m_ui.getClearButton(), &QPushButton::clicked, [this]() {
+        runOperation(std::make_unique<Clear>(&m_sectorsTableModel));
+    });
 }
 
 

@@ -2,9 +2,10 @@ set(PROGRAMMER_SRC
     Models/SectorTableModel.cpp
     Models/SerialPortListModel.cpp
 
+    Operations/Clear.cpp
     Operations/Operation.cpp
     Operations/Program.cpp
-        Operations/Verify.cpp
+    Operations/Verify.cpp
 
     Widgets/BaudRateSelector.cpp
     Widgets/ConnectionWidget.cpp
@@ -25,9 +26,10 @@ set(PROGRAMMER_MOC_TARGETS
     Models/SectorTableModel.h
     Models/SerialPortListModel.h
 
+    Operations/Clear.h
     Operations/Operation.h
     Operations/Program.h
-        Operations/Verify.h
+    Operations/Verify.h
 
     Widgets/BaudRateSelector.h
     Widgets/ConnectionWidget.h

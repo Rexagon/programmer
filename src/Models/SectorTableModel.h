@@ -36,6 +36,8 @@ public:
     std::vector<Sector> getItems(const std::vector<int> &items) const;
     std::vector<Sector> getItems() const;
 
+    std::vector<Sector> getSelectedItems() const;
+
 protected:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 

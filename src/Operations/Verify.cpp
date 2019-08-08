@@ -21,18 +21,7 @@ Verify::Verify(app::SectorTableModel *model, const QString &fileName)
 
 std::optional<QString> Verify::validate()
 {
-    bool hasSelectedSectors = false;
-    const auto sectors = getModel()->getItems();
-    for (const auto &sector : sectors)
-    {
-        if (sector.selected)
-        {
-            hasSelectedSectors = true;
-            break;
-        }
-    }
-
-    if (!hasSelectedSectors)
+    if (getSelectedSectors().empty())
     {
         return QString("Не выбрано ни одного сектора");
     }
@@ -58,16 +47,11 @@ void Verify::run()
 
 QString Verify::getDescription() const
 {
-    const auto sectors = getModel()->getItems();
+    const auto sectors = getSelectedSectors();
     QString selectedSectorsString = "";
 
     for (const auto &sector : sectors)
     {
-        if (!sector.selected)
-        {
-            continue;
-        }
-
         if (!selectedSectorsString.isEmpty())
         {
             selectedSectorsString += ", ";
