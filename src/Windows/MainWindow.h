@@ -6,6 +6,7 @@
 #include <QFileDialog>
 
 #include "MainWindowUI.h"
+#include "Models/Programmer.h"
 #include "Models/SectorTableModel.h"
 #include "Operations/Operation.h"
 
@@ -32,7 +33,7 @@ private:
 
     void runOperation(std::unique_ptr<Operation> operation);
 
-    std::function<void()> selectFileOnce(const std::function<void(const QString&)> &cb);
+    std::function<void()> selectFileOnce(const std::function<void(const QString &)> &cb);
 
     MainWindowUI m_ui;
 
@@ -41,6 +42,8 @@ private:
     ApplicationState m_applicationState;
 
     SectorTableModel m_sectorsTableModel{};
+
+    std::unique_ptr<Programmer> m_programmer{};
 
     QFileDialog *m_fileDialog = nullptr;
 };

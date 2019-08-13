@@ -1,6 +1,7 @@
 set(PROGRAMMER_SRC
     Models/SectorTableModel.cpp
     Models/SerialPortListModel.cpp
+    Models/Programmer.cpp
 
     Operations/Clear.cpp
     Operations/Operation.cpp
@@ -94,4 +95,5 @@ endif()
 
 add_custom_command(TARGET programmer POST_BUILD
     COMMAND ${WINDEPLOYQT_EXE} ${DEPLOYMENT_FLAGS} ${BUILD_OUTPUT_DIR}/programmer.exe
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EXTLIBS_DIR}/sitl/dist/bin/libsitl.dll ${BUILD_OUTPUT_DIR}/
 )

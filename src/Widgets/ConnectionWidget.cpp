@@ -63,7 +63,7 @@ void ConnectionWidget::setConnectionState(ConnectionState state)
 
 QSerialPortInfo ConnectionWidget::getSelectedSerialPort() const
 {
-    return m_serialPortSelector->itemData(m_serialPortSelector->currentIndex()).value<QSerialPortInfo>();
+    return m_serialPortSelector->itemData(m_serialPortSelector->currentIndex(), Qt::UserRole).value<QSerialPortInfo>();
 }
 
 
@@ -128,16 +128,14 @@ void ConnectionWidget::connectSignals()
 {
     auto OnChanged = static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged);
 
-    connect(m_serialPortSelector, OnChanged, [this](int index)
-    {
+    connect(m_serialPortSelector, OnChanged, [this](int index) {
         emit serialPortChanged(m_serialPortSelector->itemData(index).value<QSerialPortInfo>());
     });
 
     connect(m_baudRateSelector, OnChanged,
             [this](int index) { emit baudRateChanged(m_baudRateSelector->itemData(index).value<qint32>()); });
 
-    connect(m_connectionToggleButton, &QPushButton::clicked, [this]()
-    {
+    connect(m_connectionToggleButton, &QPushButton::clicked, [this]() {
         switch (m_state)
         {
             case ConnectionState::DISCONNECTED:

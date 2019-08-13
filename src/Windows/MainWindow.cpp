@@ -10,9 +10,9 @@
 #include <QMessageBox>
 
 #include "OperationDialog.h"
-#include <Operations/Clear.h>
 #include "Operations/Program.h"
 #include "Operations/Verify.h"
+#include <Operations/Clear.h>
 
 namespace
 {
@@ -47,14 +47,32 @@ void MainWindow::connectSignals()
         m_connectionState = ConnectionState::CONNECTING;
         syncState();
 
-        // TODO: connect via sitl
+        try
+        {
+            const auto selectedPort = m_ui.getConnectionWidget()->getSelectedSerialPort();
+            const auto selectedBaudRate = m_ui.getConnectionWidget()->getSelectedBaudRate();
 
-        m_connectionState = ConnectionState::CONNECTED;
-        m_applicationState = ApplicationState::CONNECTED;
+            std::cout << selectedPort.portName().toStdString() << std::endl;
+
+            m_programmer = std::make_unique<Programmer>(selectedPort.portName().toStdString(), selectedBaudRate);
+
+            m_connectionState = ConnectionState::CONNECTED;
+            m_applicationState = ApplicationState::CONNECTED;
+        }
+        catch (const std::exception &e)
+        {
+            std::cout << e.what() << std::endl;
+
+            QMessageBox::critical(this, "Ошибка", "Невозможно подключиться к устройству\n");
+            m_connectionState = ConnectionState::DISCONNECTED;
+        }
+
         syncState();
     });
 
     connect(m_ui.getConnectionWidget(), &ConnectionWidget::disconnectionRequest, [this] {
+        m_programmer.reset();
+
         m_connectionState = ConnectionState::DISCONNECTED;
         m_applicationState = ApplicationState::DISCONNECTED;
         syncState();
@@ -73,9 +91,8 @@ void MainWindow::connectSignals()
                 runOperation(std::make_unique<Verify>(&m_sectorsTableModel, file));
             }));
 
-    connect(m_ui.getClearButton(), &QPushButton::clicked, [this]() {
-        runOperation(std::make_unique<Clear>(&m_sectorsTableModel));
-    });
+    connect(m_ui.getClearButton(), &QPushButton::clicked,
+            [this]() { runOperation(std::make_unique<Clear>(&m_sectorsTableModel)); });
 }
 
 

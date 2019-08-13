@@ -4,6 +4,8 @@
 #include <QAbstractListModel>
 #include <QtSerialPort/QSerialPortInfo>
 
+Q_DECLARE_METATYPE(QSerialPortInfo)
+
 namespace app
 {
 class SerialPortListModel : public QAbstractListModel

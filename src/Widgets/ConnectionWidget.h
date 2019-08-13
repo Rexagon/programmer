@@ -10,8 +10,6 @@
 #include "General.h"
 #include "SerialPortSelector.h"
 
-Q_DECLARE_METATYPE(QSerialPortInfo)
-
 namespace app
 {
 class ConnectionWidget : public QWidget
