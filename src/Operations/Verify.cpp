@@ -12,8 +12,8 @@ using namespace std::chrono_literals;
 
 namespace app
 {
-Verify::Verify(app::SectorTableModel *model, const QString &fileName)
-    : Operation{model, "Проверка"}
+Verify::Verify(Programmer *programmer, SectorTableModel *model, const QString &fileName)
+    : Operation{programmer, model, "Проверка"}
     , m_fileName{fileName}
 {
 }

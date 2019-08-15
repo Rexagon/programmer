@@ -11,8 +11,8 @@ using namespace std::chrono_literals;
 
 namespace app
 {
-Program::Program(SectorTableModel *model, const QString &fileName)
-    : Operation{model, "Запись прошивки"}
+Program::Program(Programmer *programmer, SectorTableModel *model, const QString &fileName)
+    : Operation{programmer, model, "Запись прошивки"}
     , m_fileName{fileName}
 {
 }
@@ -33,6 +33,8 @@ std::optional<QString> Program::validate()
 
 void Program::run()
 {
+    std::vector<uint8_t> data;
+
     for (int i = 1; i <= 100; ++i)
     {
         std::this_thread::sleep_for(0.05s);

@@ -14,8 +14,8 @@ using namespace std::chrono_literals;
 
 namespace app
 {
-Clear::Clear(SectorTableModel *model)
-    : Operation{model, "Очистка"}
+Clear::Clear(Programmer *programmer, SectorTableModel *model)
+    : Operation{programmer, model, "Очистка"}
 {
 }
 
@@ -38,7 +38,7 @@ void Clear::run()
     {
         std::this_thread::sleep_for(0.05s);
 
-        emit notifyProgress(i, QString("Проверка: %1/100").arg(i));
+        emit notifyProgress(i, QString("Очистка: %1/100").arg(i));
     }
 
     emit notifyComplete();

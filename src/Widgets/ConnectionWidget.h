@@ -23,6 +23,8 @@ public:
 
     void setConnectionState(ConnectionState state);
 
+    void setInformationText(const QString &text);
+
     QSerialPortInfo getSelectedSerialPort() const;
     qint32 getSelectedBaudRate() const;
 

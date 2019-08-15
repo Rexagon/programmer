@@ -41,75 +41,86 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 
-void MainWindow::connectSignals()
+void MainWindow::connectProgrammer()
 {
-    connect(m_ui.getConnectionWidget(), &ConnectionWidget::connectionRequest, [this] {
-        m_connectionState = ConnectionState::CONNECTING;
-        syncState();
+    m_connectionState = ConnectionState::CONNECTING;
+    syncState();
 
-        // Обновляем интерфейс перед потенциально долгой операцией
-        repaint();
+    // Обновляем интерфейс перед потенциально долгой операцией
+    repaint();
 
-        try
-        {
-            const auto selectedPort = m_ui.getConnectionWidget()->getSelectedSerialPort();
-            const auto selectedBaudRate = m_ui.getConnectionWidget()->getSelectedBaudRate();
+    try
+    {
+        const auto connectionWidget = m_ui.getConnectionWidget();
 
-            std::cout << selectedPort.portName().toStdString() << std::endl;
+        const auto selectedPort = connectionWidget->getSelectedSerialPort();
+        const auto selectedBaudRate = connectionWidget->getSelectedBaudRate();
 
-            m_programmer = std::make_unique<Programmer>(selectedPort.portName().toStdString(), selectedBaudRate);
+        m_programmer = std::make_unique<Programmer>(selectedPort.portName().toStdString(), selectedBaudRate);
 
-            m_connectionState = ConnectionState::CONNECTED;
-            m_applicationState = ApplicationState::CONNECTED;
-        }
-        catch (const std::exception &e)
-        {
-            QMessageBox::critical(this, "Ошибка", "Невозможно подключиться к устройству\n");
-            m_connectionState = ConnectionState::DISCONNECTED;
-        }
+        connectionWidget->setInformationText(QString("Порт:\t\t\t%1\nВерсия программатора:\t%2\nВерсия SITL:\t\t%3")
+                                                 .arg(selectedPort.portName())
+                                                 .arg("unknown")
+                                                 .arg("unknown"));
 
-        syncState();
-    });
-
-    connect(m_ui.getConnectionWidget(), &ConnectionWidget::disconnectionRequest, [this] {
-        m_programmer.reset();
-
+        m_connectionState = ConnectionState::CONNECTED;
+        m_applicationState = ApplicationState::CONNECTED;
+    }
+    catch (const std::exception &e)
+    {
+        QMessageBox::critical(this, "Ошибка", "Невозможно подключиться к устройству\n");
         m_connectionState = ConnectionState::DISCONNECTED;
-        m_applicationState = ApplicationState::DISCONNECTED;
-        syncState();
-    });
+    }
 
-    connect(m_ui.getViewModeToggle(), &LinkButton::clicked, [this] {
-        m_viewMode = !m_viewMode;
-        m_ui.setViewMode(m_viewMode);
-    });
-
-    connect(m_ui.getWriteButton(), &QPushButton::clicked, selectFileOnce([this](const QString &file) {
-                runOperation(std::make_unique<Program>(&m_sectorsTableModel, file));
-            }));
-
-    connect(m_ui.getVerifyButton(), &QPushButton::clicked, selectFileOnce([this](const QString &file) {
-                runOperation(std::make_unique<Verify>(&m_sectorsTableModel, file));
-            }));
-
-    connect(m_ui.getClearButton(), &QPushButton::clicked,
-            [this]() { runOperation(std::make_unique<Clear>(&m_sectorsTableModel)); });
+    syncState();
 }
 
 
-void MainWindow::syncState()
+void MainWindow::disconnectProgrammer()
 {
+    m_programmer.reset();
+
+    m_connectionState = ConnectionState::DISCONNECTED;
+    m_applicationState = ApplicationState::DISCONNECTED;
+    syncState();
+}
+
+
+void MainWindow::runVerifyOperation()
+{
+    selectFile([this](const QString &file) {
+        runOperation(std::make_unique<Verify>(m_programmer.get(), &m_sectorsTableModel, file));
+    });
+}
+
+
+void MainWindow::runWriteOperation()
+{
+    selectFile([this](const QString &file) {
+        runOperation(std::make_unique<Program>(m_programmer.get(), &m_sectorsTableModel, file));
+    });
+}
+
+
+void MainWindow::runDumpOperation()
+{
+    selectFile([](const QString &file) {
+        std::cout << file.toStdString() << std::endl;
+        // runOperation(std::make_unique<Program>(m_programmer.get(), &m_sectorsTableModel, file));
+    });
+}
+
+
+void MainWindow::runClearOperation()
+{
+    runOperation(std::make_unique<Clear>(m_programmer.get(), &m_sectorsTableModel));
+}
+
+
+void MainWindow::toggleViewMode()
+{
+    m_viewMode = !m_viewMode;
     m_ui.setViewMode(m_viewMode);
-    m_ui.setConnectionState(m_connectionState);
-    m_ui.setApplicationState(m_applicationState);
-}
-
-
-void MainWindow::createFileDialog()
-{
-    m_fileDialog = new QFileDialog(this);
-    m_fileDialog->setFileMode(QFileDialog::AnyFile);
-    m_fileDialog->setNameFilter(FILE_DIALOG_PATTERN);
 }
 
 
@@ -129,16 +140,47 @@ void MainWindow::runOperation(std::unique_ptr<Operation> operation)
 }
 
 
-std::function<void()> MainWindow::selectFileOnce(const std::function<void(const QString &)> &cb)
+void MainWindow::selectFile(const std::function<void(const QString &)> &cb)
 {
-    return [this, cb] {
-        connect(m_fileDialog, &QFileDialog::fileSelected, [this, cb](const QString &file) {
-            m_fileDialog->disconnect();
-            cb(file);
-        });
+    m_fileDialog->disconnect();
 
-        m_fileDialog->open();
-    };
+    connect(m_fileDialog, &QFileDialog::fileSelected, [this, cb](const QString &file) {
+        m_fileDialog->disconnect();
+        cb(file);
+    });
+
+    m_fileDialog->open();
+}
+
+
+void MainWindow::createFileDialog()
+{
+    m_fileDialog = new QFileDialog(this);
+    m_fileDialog->setFileMode(QFileDialog::AnyFile);
+    m_fileDialog->setNameFilter(FILE_DIALOG_PATTERN);
+}
+
+
+void MainWindow::connectSignals()
+{
+    const auto connectionWidget = m_ui.getConnectionWidget();
+    connect(connectionWidget, &ConnectionWidget::connectionRequest, this, &MainWindow::connectProgrammer);
+    connect(connectionWidget, &ConnectionWidget::disconnectionRequest, this, &MainWindow::disconnectProgrammer);
+
+    connect(m_ui.getViewModeToggle(), &LinkButton::clicked, this, &MainWindow::toggleViewMode);
+
+    connect(m_ui.getWriteButton(), &QPushButton::clicked, this, &MainWindow::runWriteOperation);
+    connect(m_ui.getVerifyButton(), &QPushButton::clicked, this, &MainWindow::runVerifyOperation);
+    connect(m_ui.getDumpButton(), &QPushButton::clicked, this, &MainWindow::runDumpOperation);
+    connect(m_ui.getClearButton(), &QPushButton::clicked, this, &MainWindow::runClearOperation);
+}
+
+
+void MainWindow::syncState()
+{
+    m_ui.setViewMode(m_viewMode);
+    m_ui.setConnectionState(m_connectionState);
+    m_ui.setApplicationState(m_applicationState);
 }
 
 } // namespace app

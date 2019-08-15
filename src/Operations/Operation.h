@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QString>
 
+#include "Models/Programmer.h"
 #include "Models/SectorTableModel.h"
 
 namespace app
@@ -15,7 +16,7 @@ class Operation : public QObject
     Q_OBJECT
 
 public:
-    explicit Operation(SectorTableModel *model, const QString &name);
+    explicit Operation(Programmer *programmer, SectorTableModel *model, const QString &name);
 
     virtual std::optional<QString> validate() = 0;
 
@@ -35,10 +36,17 @@ signals:
     void notifyComplete(bool success = true);
 
 protected:
+    Programmer *getProgrammer() const;
+    SectorTableModel *getSectorTableModel() const;
+
     const std::vector<SectorTableModel::Sector> &getSelectedSectors() const;
 
 private:
     QString m_name;
+
+    Programmer *m_programmer;
+    SectorTableModel *m_sectorTableModel;
+
     std::vector<SectorTableModel::Sector> m_selectedSectors;
 };
 

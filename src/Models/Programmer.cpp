@@ -10,17 +10,18 @@
 
 #include <sitl/commands/Iden.h>
 #include <sitl/commands/List.h>
+#include <sitl/commands/Mrd.h>
 #include <sitl/commands/Mwr.h>
 
 namespace
 {
-constexpr auto VERSION_REG = 0x000000u;
+constexpr uint32_t VERSION_REG = 0x00000000u;
 
-constexpr auto SERVICE_REG = 0x080000u;
-constexpr auto ADDRESS_REG = 0x080002u;
+constexpr uint32_t SERVICE_REG = 0x00080000u;
+constexpr uint32_t ADDRESS_REG = 0x00080002u;
 
-constexpr auto BIVK_DATA_BEGIN = 0x040000u;
-constexpr auto BIVK_DATA_END = 0x07FFFFu;
+constexpr uint32_t BIVK_DATA_BEGIN = 0x00040000u;
+constexpr uint32_t BIVK_DATA_END = 0x0007FFFFu;
 
 void setBits(uint16_t &target, uint16_t value, uint16_t valueMask, uint16_t offset)
 {
@@ -31,10 +32,10 @@ void setBits(uint16_t &target, uint16_t value, uint16_t valueMask, uint16_t offs
 
 namespace sr
 {
-constexpr uint16_t EXT_RES_O = 0u;
-constexpr uint16_t EXT_RES_I = 1u;
-constexpr uint16_t BUS_OE = 2u;
-constexpr uint16_t RESET = 3u;
+constexpr uint16_t EXT_RES_O = 0u; // Сигнал сброса БИВК от программатора
+constexpr uint16_t EXT_RES_I = 1u; // Сигнал сброса БИВК от самого БИВК
+constexpr uint16_t BUS_OE = 2u;    // Включение буфферов
+constexpr uint16_t RESET = 3u;     // Сигнал сброса программатора
 
 } // namespace sr
 
@@ -50,7 +51,7 @@ struct Range
     void write(uint16_t &target, const app::Programmer::TimingValue &timing) const
     {
         assert(check(timing));
-        setBits(target, timing.value, 0x0003u, offset);
+        setBits(target, static_cast<uint16_t>(timing.value + 4u - static_cast<uint16_t>(max - min)), 0x0003u, offset);
     }
 
     uint16_t offset;
@@ -80,7 +81,7 @@ Programmer::Programmer(const std::string &port, unsigned int baudRate)
     m_connection.execute<sitl::cmds::List>();
 
     // Получаем описание устройства
-    //m_description = m_connection.execute<sitl::cmds::Iden>();
+    // m_description = m_connection.execute<sitl::cmds::Iden>();
 
     reset();
 }
@@ -95,14 +96,30 @@ Programmer::~Programmer()
 void Programmer::reset()
 {
     // Устанавливаем тайминги
-    setWritingTimings(2_T, 4_T, 3_T);
-    setReadingTimings(1_T, 7_T, 2_T);
+    setWritingTimings(4_T, 6_T, 4_T);
+    setReadingTimings(4_T, 7_T, 4_T);
 
     // Включаем буффер
     setBuffersEnabled(true);
 
+    // Режим сброса на бивке
+    setBits(m_serviceReg, 1u, 0x0001u, sr::EXT_RES_O);
+
     // Применяем конфигурацию
     applyConfiguration();
+}
+
+
+void Programmer::readData(std::vector<uint8_t> &output, size_t begin, size_t size)
+{
+    if (begin + size > (BIVK_DATA_END - BIVK_DATA_BEGIN))
+        throw std::logic_error{"Невозможно считать блок данных"};
+
+    output.reserve(size);
+    for (size_t address = begin; address < begin + size; ++address)
+    {
+        output.emplace_back(m_connection.execute<sitl::cmds::Mrd<uint32_t, uint8_t>>(address));
+    }
 }
 
 
@@ -132,10 +149,7 @@ void Programmer::setReadingTimings(const app::Programmer::TimingValue &setup,
 
     READ_SETUP.write(m_serviceReg, setup);
     READ_ACTIVE.write(m_serviceReg, active);
-
-    auto readHold = hold;
-    ++readHold.value;
-    READ_HOLD.write(m_serviceReg, readHold);
+    READ_HOLD.write(m_serviceReg, hold);
 }
 
 

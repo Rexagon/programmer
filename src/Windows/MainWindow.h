@@ -26,14 +26,23 @@ public:
     MainWindow &operator=(MainWindow &&) noexcept = delete;
 
 private:
-    void createFileDialog();
-    void connectSignals();
+    void connectProgrammer();
+    void disconnectProgrammer();
 
-    void syncState();
+    void runVerifyOperation();
+    void runWriteOperation();
+    void runDumpOperation();
+    void runClearOperation();
+
+    void toggleViewMode();
 
     void runOperation(std::unique_ptr<Operation> operation);
 
-    std::function<void()> selectFileOnce(const std::function<void(const QString &)> &cb);
+    void selectFile(const std::function<void(const QString &)> &cb);
+
+    void createFileDialog();
+    void connectSignals();
+    void syncState();
 
     MainWindowUI m_ui;
 
@@ -41,9 +50,8 @@ private:
     ConnectionState m_connectionState;
     ApplicationState m_applicationState;
 
-    SectorTableModel m_sectorsTableModel{};
-
     std::unique_ptr<Programmer> m_programmer{};
+    SectorTableModel m_sectorsTableModel{};
 
     QFileDialog *m_fileDialog = nullptr;
 };

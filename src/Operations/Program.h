@@ -11,7 +11,7 @@ class Program final : public Operation
     Q_OBJECT
 
 public:
-    explicit Program(SectorTableModel *model, const QString &fileName);
+    explicit Program(Programmer *programmer, SectorTableModel *model, const QString &fileName);
 
     std::optional<QString> validate() override;
 

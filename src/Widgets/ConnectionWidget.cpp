@@ -61,6 +61,12 @@ void ConnectionWidget::setConnectionState(ConnectionState state)
 }
 
 
+void ConnectionWidget::setInformationText(const QString &text)
+{
+    m_connectionInfoLabel->setText(text);
+}
+
+
 QSerialPortInfo ConnectionWidget::getSelectedSerialPort() const
 {
     return m_serialPortSelector->itemData(m_serialPortSelector->currentIndex(), Qt::UserRole).value<QSerialPortInfo>();
@@ -112,7 +118,7 @@ void ConnectionWidget::createUI()
     layout->addWidget(m_baudRateSelector);
 
     // Info page
-    m_connectionInfoLabel = new QLabel("Порт:\t\t\tCOM1\nВерсия программатора:\t1.0\nВерсия SITL:\t\t1.0", this);
+    m_connectionInfoLabel = new QLabel(this);
     layout->addWidget(m_connectionInfoLabel);
 
     // Space

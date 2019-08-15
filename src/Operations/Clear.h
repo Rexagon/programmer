@@ -8,7 +8,7 @@ namespace app
 class Clear : public Operation
 {
 public:
-    explicit Clear(SectorTableModel *model);
+    explicit Clear(Programmer *programmer, SectorTableModel *model);
 
     std::optional<QString> validate() override;
 

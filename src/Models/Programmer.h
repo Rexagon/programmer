@@ -18,6 +18,8 @@ public:
 
     void reset();
 
+    void readData(std::vector<uint8_t> &output, size_t begin, size_t size);
+
     void setBuffersEnabled(bool enabled);
     void setWritingTimings(const TimingValue &setup, const TimingValue &active, const TimingValue &hold);
     void setReadingTimings(const TimingValue &setup, const TimingValue &active, const TimingValue &hold);

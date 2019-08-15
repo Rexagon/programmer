@@ -10,7 +10,7 @@ class Verify final : public Operation
     Q_OBJECT
 
 public:
-    explicit Verify(SectorTableModel *model, const QString &fileName);
+    explicit Verify(Programmer *programmer, SectorTableModel *model, const QString &fileName);
 
     std::optional<QString> validate() override;
 
