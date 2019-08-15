@@ -26,6 +26,8 @@ namespace app
 Programmer::Programmer(const std::string &port, unsigned int baudRate)
     : m_connection{port, baudRate, true}
 {
+    m_connection.setResponseTimeout(2);
+
     m_connection.execute<sitl::cmds::List>();
 
     m_connection.execute<sitl::cmds::Mwr<uint32_t, uint16_t>>(SERVICE_REG, 0xFFFFu);

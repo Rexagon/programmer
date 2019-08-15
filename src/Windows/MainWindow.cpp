@@ -47,6 +47,9 @@ void MainWindow::connectSignals()
         m_connectionState = ConnectionState::CONNECTING;
         syncState();
 
+        // Обновляем интерфейс перед потенциально долгой операцией
+        repaint();
+
         try
         {
             const auto selectedPort = m_ui.getConnectionWidget()->getSelectedSerialPort();
@@ -61,8 +64,6 @@ void MainWindow::connectSignals()
         }
         catch (const std::exception &e)
         {
-            std::cout << e.what() << std::endl;
-
             QMessageBox::critical(this, "Ошибка", "Невозможно подключиться к устройству\n");
             m_connectionState = ConnectionState::DISCONNECTED;
         }
