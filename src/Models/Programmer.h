@@ -3,6 +3,8 @@
 
 #include <sitl/Connection.h>
 
+#include "SectorTableModel.h"
+
 namespace app
 {
 class Programmer final
@@ -19,6 +21,9 @@ public:
     void reset();
 
     void readData(std::vector<uint8_t> &output, size_t begin, size_t size);
+
+    void clearAllSectors();
+    void clearSector(const SectorTableModel::Sector &sector);
 
     void setBuffersEnabled(bool enabled);
     void setWritingTimings(const TimingValue &setup, const TimingValue &active, const TimingValue &hold);

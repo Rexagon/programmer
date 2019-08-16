@@ -118,8 +118,34 @@ void Programmer::readData(std::vector<uint8_t> &output, size_t begin, size_t siz
     output.reserve(size);
     for (size_t address = begin; address < begin + size; ++address)
     {
-        output.emplace_back(m_connection.execute<sitl::cmds::Mrd<uint32_t, uint8_t>>(address));
+        output.emplace_back(m_connection.execute<sitl::cmds::Mrd<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + address));
     }
+}
+
+
+void Programmer::clearAllSectors()
+{
+    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0xAAu);
+    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0x555u, 0x55u);
+
+    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0x80u);
+    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0xAAu);
+
+    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0x555u, 0x55u);
+    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0x10u);
+}
+
+
+void Programmer::clearSector(const app::SectorTableModel::Sector &sector)
+{
+    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0xAAu);
+    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0x555u, 0x55u);
+
+    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0x80u);
+    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0xAAu);
+
+    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0x555u, 0x55u);
+    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + sector.address * 1024, 0x30u);
 }
 
 

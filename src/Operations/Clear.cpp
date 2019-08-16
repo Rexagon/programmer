@@ -34,11 +34,14 @@ std::optional<QString> Clear::validate()
 
 void Clear::run()
 {
-    for (int i = 1; i <= 100; ++i)
-    {
-        std::this_thread::sleep_for(0.05s);
+    const auto selectedSectors = getSelectedSectors();
 
-        emit notifyProgress(100, i, QString("Очистка: %1/100").arg(i));
+    for (size_t i = 0; i < selectedSectors.size(); ++i)
+    {
+        getProgrammer()->clearSector(selectedSectors[i]);
+
+        emit notifyProgress(static_cast<int>(selectedSectors.size()), static_cast<int>(i + 1),
+                            QString("Очистка: %1/%2").arg(i + 1).arg(selectedSectors.size()));
     }
 
     emit notifyComplete();
