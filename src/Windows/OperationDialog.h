@@ -40,7 +40,7 @@ private:
 
     void connectSignals();
 
-    void onProgress(int progress, const QString &message);
+    void onProgress(int total, int current, const QString &message);
     void onComplete(bool success);
 
 private:

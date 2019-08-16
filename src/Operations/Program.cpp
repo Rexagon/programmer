@@ -33,13 +33,11 @@ std::optional<QString> Program::validate()
 
 void Program::run()
 {
-    std::vector<uint8_t> data;
-
     for (int i = 1; i <= 100; ++i)
     {
         std::this_thread::sleep_for(0.05s);
 
-        emit notifyProgress(i, QString("Программирование: %1/100").arg(i));
+        emit notifyProgress(100, i, QString("Программирование: %1/100").arg(i));
     }
 
     emit notifyComplete();

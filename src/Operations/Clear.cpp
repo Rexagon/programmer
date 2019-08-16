@@ -38,7 +38,7 @@ void Clear::run()
     {
         std::this_thread::sleep_for(0.05s);
 
-        emit notifyProgress(i, QString("Очистка: %1/100").arg(i));
+        emit notifyProgress(100, i, QString("Очистка: %1/100").arg(i));
     }
 
     emit notifyComplete();

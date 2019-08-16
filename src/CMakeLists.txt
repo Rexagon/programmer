@@ -5,6 +5,7 @@ set(PROGRAMMER_SRC
 
     Operations/Clear.cpp
     Operations/Operation.cpp
+    Operations/Dump.cpp
     Operations/Program.cpp
     Operations/Verify.cpp
 
@@ -28,6 +29,7 @@ set(PROGRAMMER_MOC_TARGETS
     Models/SerialPortListModel.h
 
     Operations/Clear.h
+    Operations/Dump.h
     Operations/Operation.h
     Operations/Program.h
     Operations/Verify.h

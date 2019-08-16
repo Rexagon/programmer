@@ -32,7 +32,7 @@ public:
     Operation &operator=(Operation &&) noexcept = delete;
 
 signals:
-    void notifyProgress(int progress, const QString &description = "");
+    void notifyProgress(int total, int current, const QString &description = "");
     void notifyComplete(bool success = true);
 
 protected:

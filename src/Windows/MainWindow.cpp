@@ -10,6 +10,7 @@
 #include <QMessageBox>
 
 #include "OperationDialog.h"
+#include "Operations/Dump.h"
 #include "Operations/Program.h"
 #include "Operations/Verify.h"
 #include <Operations/Clear.h>
@@ -104,9 +105,8 @@ void MainWindow::runWriteOperation()
 
 void MainWindow::runDumpOperation()
 {
-    selectFile([](const QString &file) {
-        std::cout << file.toStdString() << std::endl;
-        // runOperation(std::make_unique<Program>(m_programmer.get(), &m_sectorsTableModel, file));
+    selectFile([this](const QString &file) {
+        runOperation(std::make_unique<Dump>(m_programmer.get(), &m_sectorsTableModel, file));
     });
 }
 

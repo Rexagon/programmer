@@ -74,7 +74,7 @@ constexpr auto READ_HOLD = Range{14u /* offset */, 2u /* min */, 4u /* max */};
 namespace app
 {
 Programmer::Programmer(const std::string &port, unsigned int baudRate)
-    : m_connection{port, baudRate, true}
+    : m_connection{port, baudRate, false}
 {
     // Проверяем соединение
     m_connection.setResponseTimeout(2);

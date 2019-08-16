@@ -23,6 +23,8 @@ OperationDialog::OperationDialog(std::unique_ptr<Operation> operation, QWidget *
     , m_state{DEFAULT_STATE}
     , m_operation{std::move(operation)}
 {
+    setAttribute(Qt::WA_DeleteOnClose);
+
     createUI();
     connectSignals();
 
@@ -181,10 +183,11 @@ void OperationDialog::connectSignals()
 }
 
 
-void OperationDialog::onProgress(int progress, const QString &message)
+void OperationDialog::onProgress(int total, int current, const QString &message)
 {
     m_progressLabel->setText(message);
-    m_progressBar->setValue(progress);
+    m_progressBar->setRange(0, total);
+    m_progressBar->setValue(current);
 }
 
 
