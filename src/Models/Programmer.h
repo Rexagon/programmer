@@ -21,7 +21,7 @@ public:
     void reset();
 
     void readData(std::vector<uint8_t> &data, size_t begin, size_t size);
-    void writeData(const uint8_t *data, size_t begin, size_t size);
+    void writeData(const void *data, size_t begin, size_t size);
 
     void enableProgramming();
     void disableProgramming();

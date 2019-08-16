@@ -49,36 +49,38 @@ std::optional<QString> Dump::validate()
 void Dump::run()
 {
     const size_t chunkSize = 1024;
-
-    std::list<std::vector<uint8_t>> chunks;
-
     const auto &[begin, total] = m_range;
 
-    for (auto i = begin; i < begin + total; ++i)
-    {
-        const auto current = i - begin;
-        const auto progressString =
-            QString("Скопировано байт: %1 из %2").arg(current * chunkSize).arg(total * chunkSize);
+    // Считывание в память
+    std::list<std::vector<uint8_t>> chunks;
 
+    for (auto address = begin; address < begin + total; address += chunkSize)
+    {
+        const auto current = address - begin;
+        const auto progressString = QString("Скопировано байт: %L1 из %L2").arg(current).arg(total);
         emit notifyProgress(static_cast<int>(total), static_cast<int>(current), progressString);
 
         chunks.emplace_back();
-        getProgrammer()->readData(chunks.back(), i * chunkSize, chunkSize);
+        getProgrammer()->readData(chunks.back(), address, chunkSize);
     }
 
+
+    // Запись в файл
     auto current = 0;
     for (const auto &chunk : chunks)
     {
+        const auto progressString = QString("Запись в файл: %1 / %2").arg(current + 1).arg(chunks.size());
+        emit notifyProgress(static_cast<int>(chunks.size()), current, progressString);
         ++current;
-
-        emit notifyProgress(static_cast<int>(m_range.second), current,
-                            QString{"Запись в файл %1 / %2"}.arg(current).arg(chunks.size()));
 
         m_file.write(reinterpret_cast<const char *>(chunk.data()), static_cast<qint64>(chunk.size()));
     }
 
     m_file.close();
 
+
+    // Готово
+    emit notifyProgress(1, 1, "Готово");
     emit notifyComplete();
 }
 

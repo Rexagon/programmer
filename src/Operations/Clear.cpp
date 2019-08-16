@@ -2,15 +2,9 @@
  * This is an open source non-commercial project. Dear PVS-Studio, please check it.
  * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
  */
-
 #include "Clear.h"
 
 #include <chrono>
-#include <thread>
-
-#include "Models/SectorTableModel.h"
-
-using namespace std::chrono_literals;
 
 namespace app
 {
@@ -36,14 +30,17 @@ void Clear::run()
 {
     const auto selectedSectors = getSelectedSectors();
 
+    // Очистка секторов
     for (size_t i = 0; i < selectedSectors.size(); ++i)
     {
         emit notifyProgress(static_cast<int>(selectedSectors.size()), static_cast<int>(i),
-                            QString("Очистка: %1/%2").arg(i).arg(selectedSectors.size()));
+                            QString("Очищено секторов: %1 из %2").arg(i).arg(selectedSectors.size()));
 
         getProgrammer()->clearSector(selectedSectors[i]);
     }
 
+
+    // Готово
     emit notifyProgress(1, 1, "Готово");
     emit notifyComplete();
 }

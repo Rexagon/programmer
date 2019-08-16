@@ -74,7 +74,7 @@ constexpr auto READ_HOLD = Range{14u /* offset */, 2u /* min */, 4u /* max */};
 namespace app
 {
 Programmer::Programmer(const std::string &port, unsigned int baudRate)
-    : m_connection{port, baudRate, false}
+    : m_connection{port, baudRate, true}
 {
     // Проверяем соединение
     m_connection.setResponseTimeout(2);
@@ -127,7 +127,7 @@ void Programmer::readData(std::vector<uint8_t> &data, size_t begin, const size_t
 }
 
 
-void Programmer::writeData(const uint8_t *data, const size_t begin, const size_t size)
+void Programmer::writeData(const void *data, const size_t begin, const size_t size)
 {
     if (!m_isProgrammingEnabled)
         throw std::runtime_error{"Режим программирования выключен"};
@@ -138,7 +138,8 @@ void Programmer::writeData(const uint8_t *data, const size_t begin, const size_t
     for (size_t i = 0; i < size; ++i)
     {
         m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN, 0xA0u);
-        m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + begin + i, data[i]);
+        m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + begin + i,
+                                                     static_cast<const uint8_t *>(data)[i]);
     }
 }
 
@@ -171,7 +172,7 @@ void Programmer::clearSector(const app::SectorTableModel::Sector &sector)
     m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0xAAu);
 
     m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0x555u, 0x55u);
-    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + sector.address * 1024, 0x30u);
+    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + sector.address, 0x30u);
 }
 
 

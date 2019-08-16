@@ -57,6 +57,8 @@ std::optional<QString> Program::validate()
 
 void Program::run()
 {
+    const size_t chunkSize = 1024;
+    const auto &begin = m_range.first;
     const auto &programmer = getProgrammer();
     const auto &selectedSectors = getSelectedSectors();
 
@@ -64,42 +66,40 @@ void Program::run()
     for (size_t i = 0; i < selectedSectors.size(); ++i)
     {
         emit notifyProgress(static_cast<int>(selectedSectors.size()), static_cast<int>(i),
-                            QString("Очистка: %1/%2").arg(i).arg(selectedSectors.size()));
+                            QString("Очищено секторов: %1 из %2").arg(i).arg(selectedSectors.size()));
 
         getProgrammer()->clearSector(selectedSectors[i]);
     }
 
+
     // Чтение файла
     emit notifyProgress(0, 0, "Чтение файла");
 
-    std::vector<uint8_t> data;
-    data.resize(static_cast<size_t>(m_file.size()));
-    m_file.read(reinterpret_cast<char *>(data.data()), data.size());
+    const auto data = m_file.readAll();
+    const auto dataSize = static_cast<size_t>(data.size());
+    const size_t chunkCount = dataSize / chunkSize + (dataSize % chunkSize) > 0;
 
-    size_t chunkSize = 1024;
-    const size_t chunkCount = data.size() / chunkSize + static_cast<size_t>((data.size() % chunkSize) > 0);
 
     // Программирование
     emit notifyProgress(0, 0, "Включение режима программирования");
     programmer->enableProgramming();
 
-    const auto &begin = m_range.first * 1024;
-
-    for (size_t i = 0; i < chunkCount; ++i)
+    for (auto address = begin; address < begin + dataSize * chunkCount; address += chunkSize)
     {
-        emit notifyProgress(static_cast<int>(chunkCount), static_cast<int>(i),
-                            QString("Программирование: %1 / %2").arg(i * chunkSize).arg(chunkCount * chunkSize));
+        const auto current = address - begin;
+        const auto progressString = QString("Записано байт: %L1 из %L2").arg(current).arg(dataSize);
 
+        emit notifyProgress(static_cast<int>(dataSize), static_cast<int>(current), progressString);
 
-        // TODO: refactor
-        const auto dataChunkSize = (i + 1) * chunkCount > data.size() ? data.size() % chunkSize : chunkSize;
+        const auto dataChunkSize = (address + chunkSize) > dataSize ? dataSize % chunkSize : chunkSize;
 
-        programmer->writeData(data.data() + i, begin + i, dataChunkSize);
+        programmer->writeData(data.data() + address, address, dataChunkSize);
     }
 
     emit notifyProgress(0, 0, "Выключение режима программирования");
     programmer->disableProgramming();
 
+    // Готово
     emit notifyProgress(1, 1, "Готово");
     emit notifyComplete();
 }

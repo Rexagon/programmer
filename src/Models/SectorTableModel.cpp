@@ -15,13 +15,13 @@ SectorTableModel::SectorTableModel(QObject *parent)
     // Создаём сектора
     for (size_t i = 0; i < 19; ++i)
     {
-        m_sectors.append(Sector{i, 64, 0, false});
+        m_sectors.append(Sector{i, 64 * 1024, 0, false});
     }
 
-    m_sectors[0].size = 16;
-    m_sectors[1].size = 8;
-    m_sectors[2].size = 8;
-    m_sectors[3].size = 32;
+    m_sectors[0].size = 16 * 1024;
+    m_sectors[1].size = 8 * 1024;
+    m_sectors[2].size = 8 * 1024;
+    m_sectors[3].size = 32 * 1024;
 
     // Заполняем адреса секторов
     size_t currentAddress = 0;
@@ -151,14 +151,14 @@ QVariant SectorTableModel::data(const QModelIndex &index, int role) const
                 return QString("SA%1").arg(index.row());
 
             case Column::SIZE:
-                return QString("%1 KБ").arg(m_sectors[index.row()].size);
+                return QString("%1 KБ").arg(m_sectors[index.row()].size / 1024);
 
             case Column::ADDRESS:
             {
                 const auto sector = m_sectors[index.row()];
                 return QString("%1h-%2h")
-                    .arg(QString::number(sector.address * 1024, 16), 6, '0')
-                    .arg(QString::number((sector.address + sector.size) * 1024 - 1, 16), 6, '0');
+                    .arg(QString::number(sector.address, 16), 6, '0')
+                    .arg(QString::number(sector.address + sector.size - 1, 16), 6, '0');
             }
 
             default:
