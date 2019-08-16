@@ -20,9 +20,12 @@ public:
 
     void reset();
 
-    void readData(std::vector<uint8_t> &output, size_t begin, size_t size);
+    void readData(std::vector<uint8_t> &data, size_t begin, size_t size);
+    void writeData(const uint8_t *data, size_t begin, size_t size);
 
-    void clearAllSectors();
+    void enableProgramming();
+    void disableProgramming();
+
     void clearSector(const SectorTableModel::Sector &sector);
 
     void setBuffersEnabled(bool enabled);
@@ -38,6 +41,7 @@ private:
 
     std::string m_description{};
     uint16_t m_serviceReg = 0x0000u;
+    bool m_isProgrammingEnabled = false;
 };
 
 constexpr Programmer::TimingValue operator""_T(unsigned long long value)

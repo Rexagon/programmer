@@ -5,13 +5,13 @@
 #include "Programmer.h"
 
 #include <cassert>
-#include <iomanip>
-#include <iostream>
 
 #include <sitl/commands/Iden.h>
 #include <sitl/commands/List.h>
 #include <sitl/commands/Mrd.h>
 #include <sitl/commands/Mwr.h>
+
+using namespace sitl::cmds;
 
 namespace
 {
@@ -84,6 +84,7 @@ Programmer::Programmer(const std::string &port, unsigned int baudRate)
     // m_description = m_connection.execute<sitl::cmds::Iden>();
 
     reset();
+    disableProgramming();
 }
 
 
@@ -107,45 +108,70 @@ void Programmer::reset()
 
     // Применяем конфигурацию
     applyConfiguration();
+
+    // Отключаем режим программирования
+    disableProgramming();
 }
 
 
-void Programmer::readData(std::vector<uint8_t> &output, size_t begin, size_t size)
+void Programmer::readData(std::vector<uint8_t> &data, size_t begin, const size_t size)
 {
-    if (begin + size > (BIVK_DATA_END - BIVK_DATA_BEGIN))
+    if (begin + size > BIVK_DATA_END - BIVK_DATA_BEGIN)
         throw std::logic_error{"Невозможно считать блок данных"};
 
-    output.reserve(size);
+    data.reserve(size);
     for (size_t address = begin; address < begin + size; ++address)
     {
-        output.emplace_back(m_connection.execute<sitl::cmds::Mrd<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + address));
+        data.emplace_back(m_connection.execute<Mrd<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + address));
     }
 }
 
 
-void Programmer::clearAllSectors()
+void Programmer::writeData(const uint8_t *data, const size_t begin, const size_t size)
 {
-    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0xAAu);
-    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0x555u, 0x55u);
+    if (!m_isProgrammingEnabled)
+        throw std::runtime_error{"Режим программирования выключен"};
 
-    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0x80u);
-    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0xAAu);
+    if (begin + size > BIVK_DATA_END - BIVK_DATA_BEGIN)
+        throw std::logic_error{"Невозможно записать блок данных"};
 
-    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0x555u, 0x55u);
-    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0x10u);
+    for (size_t i = 0; i < size; ++i)
+    {
+        m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN, 0xA0u);
+        m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + begin + i, data[i]);
+    }
+}
+
+
+void Programmer::enableProgramming()
+{
+    m_isProgrammingEnabled = true;
+    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0xAAu);
+    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0x555u, 0x55u);
+    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0x20u);
+}
+
+
+void Programmer::disableProgramming()
+{
+    m_isProgrammingEnabled = false;
+    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN, 0x90u);
+    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN, 0x00u);
 }
 
 
 void Programmer::clearSector(const app::SectorTableModel::Sector &sector)
 {
-    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0xAAu);
-    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0x555u, 0x55u);
+    using namespace sitl::cmds;
 
-    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0x80u);
-    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0xAAu);
+    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0xAAu);
+    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0x555u, 0x55u);
 
-    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0x555u, 0x55u);
-    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + sector.address * 1024, 0x30u);
+    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0x80u);
+    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0xAAu);
+
+    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0x555u, 0x55u);
+    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + sector.address * 1024, 0x30u);
 }
 
 

@@ -38,12 +38,13 @@ void Clear::run()
 
     for (size_t i = 0; i < selectedSectors.size(); ++i)
     {
-        getProgrammer()->clearSector(selectedSectors[i]);
+        emit notifyProgress(static_cast<int>(selectedSectors.size()), static_cast<int>(i),
+                            QString("Очистка: %1/%2").arg(i).arg(selectedSectors.size()));
 
-        emit notifyProgress(static_cast<int>(selectedSectors.size()), static_cast<int>(i + 1),
-                            QString("Очистка: %1/%2").arg(i + 1).arg(selectedSectors.size()));
+        getProgrammer()->clearSector(selectedSectors[i]);
     }
 
+    emit notifyProgress(1, 1, "Готово");
     emit notifyComplete();
 }
 

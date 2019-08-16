@@ -4,6 +4,8 @@
 #include "Models/SectorTableModel.h"
 #include "Operation.h"
 
+#include <QFile>
+
 namespace app
 {
 class Program final : public Operation
@@ -20,7 +22,8 @@ public:
     QString getDescription() const override;
 
 private:
-    QString m_fileName;
+    QFile m_file;
+    std::pair<size_t, size_t> m_range = {0, 0};
 };
 
 } // namespace app
