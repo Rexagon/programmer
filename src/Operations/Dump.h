@@ -20,7 +20,6 @@ public:
 
 private:
     QFile m_file;
-    std::pair<size_t, size_t> m_range = {0, 0};
 };
 
 } // namespace app
