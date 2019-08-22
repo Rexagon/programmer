@@ -9,12 +9,9 @@ namespace app
 {
 class Programmer final
 {
-public:
-    struct TimingValue
-    {
-        uint16_t value;
-    };
+    using Timings = std::tuple<uint8_t, uint8_t, uint8_t>;
 
+public:
     explicit Programmer(const std::string &port, unsigned int baudRate);
     ~Programmer();
 
@@ -29,25 +26,31 @@ public:
     void clearSector(const SectorTableModel::Sector &sector);
 
     void setBuffersEnabled(bool enabled);
-    void setWritingTimings(const TimingValue &setup, const TimingValue &active, const TimingValue &hold);
-    void setReadingTimings(const TimingValue &setup, const TimingValue &active, const TimingValue &hold);
+    void setWritingTimings(uint8_t setup, uint8_t active, uint8_t hold);
+    void setReadingTimings(uint8_t setup, uint8_t active, uint8_t hold);
 
     void applyConfiguration();
 
     const std::string &getDescription() const;
 
 private:
+    uint8_t readData(uint32_t address);
+    void writeData(uint32_t address, uint8_t data);
+
+    void setServiceReg(uint16_t data, bool force = false);
+    void setAddressReg(uint16_t data, bool force = false);
+
     sitl::Connection m_connection;
 
     std::string m_description{};
+    Timings m_writingTimings{};
+    Timings m_readingTimings{};
+    bool m_areBuffersEnabled = false;
+
     uint16_t m_serviceReg = 0x0000u;
+    uint16_t m_addressReg = 0x0000u;
     bool m_isProgrammingEnabled = false;
 };
-
-constexpr Programmer::TimingValue operator""_T(unsigned long long value)
-{
-    return Programmer::TimingValue{static_cast<uint8_t>(value)};
-}
 
 } // namespace app
 

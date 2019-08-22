@@ -43,15 +43,15 @@ namespace timings
 {
 struct Range
 {
-    bool check(const app::Programmer::TimingValue &timing) const
+    bool check(const uint8_t value) const
     {
-        return timing.value >= min && timing.value <= max;
+        return value >= min && value <= max;
     }
 
-    void write(uint16_t &target, const app::Programmer::TimingValue &timing) const
+    void write(uint16_t &target, const uint8_t value) const
     {
-        assert(check(timing));
-        setBits(target, static_cast<uint16_t>(timing.value + 4u - static_cast<uint16_t>(max - min)), 0x0003u, offset);
+        assert(check(value));
+        setBits(target, static_cast<uint16_t>(value + 4u - static_cast<uint16_t>(max - min)), 0x0003u, offset);
     }
 
     uint16_t offset;
@@ -78,43 +78,43 @@ Programmer::Programmer(const std::string &port, unsigned int baudRate)
 {
     // Проверяем соединение
     m_connection.setResponseTimeout(2);
-    m_connection.execute<sitl::cmds::List>();
+    m_connection.execute<List>();
 
     // Получаем описание устройства
-    // m_description = m_connection.execute<sitl::cmds::Iden>();
+    // m_description = m_connection.execute<Iden>();
 
     reset();
-    disableProgramming();
 }
 
 
 Programmer::~Programmer()
 {
-    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint16_t>>(SERVICE_REG, 0x0000u);
+    setServiceReg(0x0000u);
+    setAddressReg(0x0000u);
 }
 
 
 void Programmer::reset()
 {
-    // Устанавливаем тайминги
-    setWritingTimings(4_T, 6_T, 4_T);
-    setReadingTimings(4_T, 7_T, 4_T);
-
     // Включаем буффер
     setBuffersEnabled(true);
 
-    // Режим сброса на бивке
-    setBits(m_serviceReg, 1u, 0x0001u, sr::EXT_RES_O);
+    // Устанавливаем тайминги
+    setWritingTimings(4, 6, 4);
+    setReadingTimings(4, 7, 4);
 
     // Применяем конфигурацию
     applyConfiguration();
+
+    // Обнуляем адресный регистр
+    setAddressReg(0x0000u, true);
 
     // Отключаем режим программирования
     disableProgramming();
 }
 
 
-void Programmer::readData(std::vector<uint8_t> &data, size_t begin, const size_t size)
+void Programmer::readData(std::vector<uint8_t> &data, const size_t begin, const size_t size)
 {
     if (begin + size > BIVK_DATA_END - BIVK_DATA_BEGIN)
         throw std::logic_error{"Невозможно считать блок данных"};
@@ -122,7 +122,7 @@ void Programmer::readData(std::vector<uint8_t> &data, size_t begin, const size_t
     data.reserve(size);
     for (size_t address = begin; address < begin + size; ++address)
     {
-        data.emplace_back(m_connection.execute<Mrd<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + address));
+        data.emplace_back(readData(address));
     }
 }
 
@@ -137,9 +137,8 @@ void Programmer::writeData(const void *data, const size_t begin, const size_t si
 
     for (size_t i = 0; i < size; ++i)
     {
-        m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN, 0xA0u);
-        m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + begin + i,
-                                                     static_cast<const uint8_t *>(data)[i]);
+        m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN, 0xA0u); // Пишем в любой адрес
+        writeData(begin + i, static_cast<const uint8_t *>(data)[i]);
     }
 }
 
@@ -147,62 +146,75 @@ void Programmer::writeData(const void *data, const size_t begin, const size_t si
 void Programmer::enableProgramming()
 {
     m_isProgrammingEnabled = true;
-    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0xAAu);
-    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0x555u, 0x55u);
-    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0x20u);
+
+    writeData(0xAAAAAu, 0xAAu);
+    writeData(0x55555u, 0x55u);
+    writeData(0xAAAAAu, 0x20u);
 }
 
 
 void Programmer::disableProgramming()
 {
     m_isProgrammingEnabled = false;
-    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN, 0x90u);
-    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN, 0x00u);
+    writeData(0x00000u, 0x90u);
+    writeData(0x00000u, 0x00u);
 }
 
 
 void Programmer::clearSector(const app::SectorTableModel::Sector &sector)
 {
-    using namespace sitl::cmds;
-
-    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0xAAu);
-    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0x555u, 0x55u);
-
-    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0x80u);
-    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0xAAAu, 0xAAu);
-
-    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + 0x555u, 0x55u);
-    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + sector.address, 0x30u);
+    writeData(0xAAAAAu, 0xAAu);
+    writeData(0x55555u, 0x55u);
+    writeData(0xAAAAAu, 0x80u);
+    writeData(0xAAAAAu, 0xAAu);
+    writeData(0x55555u, 0x55u);
+    writeData(sector.address, 0x30u);
 }
 
 
 void Programmer::setBuffersEnabled(bool enabled)
 {
-    setBits(m_serviceReg, enabled, 0x0001u, sr::BUS_OE);
+    m_areBuffersEnabled = enabled;
 }
 
 
-void Programmer::setWritingTimings(const Programmer::TimingValue &setup,
-                                   const Programmer::TimingValue &active,
-                                   const Programmer::TimingValue &hold)
+void Programmer::setWritingTimings(const uint8_t setup, const uint8_t active, const uint8_t hold)
 {
     using namespace timings;
 
-    WRITE_SETUP.write(m_serviceReg, setup);
-    WRITE_ACTIVE.write(m_serviceReg, active);
-    WRITE_HOLD.write(m_serviceReg, hold);
+    assert(WRITE_SETUP.check(value) && WRITE_ACTIVE.check(active) && WRITE_HOLD.check(hold));
+    m_writingTimings = {setup, active, hold};
 }
 
 
-void Programmer::setReadingTimings(const app::Programmer::TimingValue &setup,
-                                   const app::Programmer::TimingValue &active,
-                                   const app::Programmer::TimingValue &hold)
+void Programmer::setReadingTimings(const uint8_t setup, const uint8_t active, const uint8_t hold)
 {
     using namespace timings;
 
-    READ_SETUP.write(m_serviceReg, setup);
-    READ_ACTIVE.write(m_serviceReg, active);
-    READ_HOLD.write(m_serviceReg, hold);
+    assert(READ_SETUP.check(value) && READ_ACTIVE.check(active) && READ_HOLD.check(hold));
+    m_readingTimings = {setup, active, hold};
+}
+
+
+void Programmer::applyConfiguration()
+{
+    using namespace timings;
+
+    uint16_t configuration = 0x0000u;
+
+    setBits(m_serviceReg, true, 0x0001u, sr::EXT_RES_O); // Всегда включаем режим сброса на бивке
+
+    setBits(configuration, m_areBuffersEnabled, 0x0001u, sr::BUS_OE);
+
+    WRITE_SETUP.write(configuration, std::get<0>(m_writingTimings));
+    WRITE_ACTIVE.write(configuration, std::get<1>(m_writingTimings));
+    WRITE_HOLD.write(configuration, std::get<2>(m_writingTimings));
+
+    READ_SETUP.write(configuration, std::get<0>(m_readingTimings));
+    READ_ACTIVE.write(configuration, std::get<1>(m_readingTimings));
+    READ_HOLD.write(configuration, std::get<2>(m_readingTimings));
+
+    setServiceReg(configuration);
 }
 
 
@@ -212,9 +224,41 @@ const std::string &Programmer::getDescription() const
 }
 
 
-void Programmer::applyConfiguration()
+uint8_t Programmer::readData(uint32_t address)
 {
-    m_connection.execute<sitl::cmds::Mwr<uint32_t, uint16_t>>(SERVICE_REG, m_serviceReg);
+    setAddressReg(static_cast<uint16_t>(address >> 18u));
+
+    address &= 0x0003FFFFu; // оставляем только 18 разрядов
+    return m_connection.execute<Mrd<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + address);
+}
+
+
+void Programmer::writeData(uint32_t address, const uint8_t data)
+{
+    setAddressReg(static_cast<uint16_t>(address >> 18u));
+
+    address &= 0x0003FFFFu; // оставляем только 18 разрядов
+    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + address, data);
+}
+
+
+void Programmer::setServiceReg(const uint16_t data, const bool force)
+{
+    if (m_serviceReg != data || force)
+    {
+        m_connection.execute<Mwr<uint32_t, uint16_t>>(SERVICE_REG, data);
+        m_serviceReg = data;
+    }
+}
+
+
+void Programmer::setAddressReg(const uint16_t data, const bool force)
+{
+    if (m_addressReg != data || force)
+    {
+        m_connection.execute<Mwr<uint32_t, uint16_t>>(ADDRESS_REG, data);
+        m_addressReg = data;
+    }
 }
 
 } // namespace app

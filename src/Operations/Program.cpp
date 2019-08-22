@@ -77,23 +77,22 @@ void Program::run()
 
     const auto data = m_file.readAll();
     const auto dataSize = static_cast<size_t>(data.size());
-    const size_t chunkCount = dataSize / chunkSize + (dataSize % chunkSize) > 0;
+    const size_t chunkCount = dataSize / chunkSize + ((dataSize % chunkSize) > 0);
 
+    printf("Data size: %u\nChunk count: %u\nReal chunk count: %u\n", dataSize, chunkCount, dataSize / chunkSize);
 
     // Программирование
     emit notifyProgress(0, 0, "Включение режима программирования");
     programmer->enableProgramming();
 
-    for (auto address = begin; address < begin + dataSize * chunkCount; address += chunkSize)
+    for (auto address = begin; address < begin + dataSize; address += chunkSize)
     {
         const auto current = address - begin;
         const auto progressString = QString("Записано байт: %L1 из %L2").arg(current).arg(dataSize);
 
         emit notifyProgress(static_cast<int>(dataSize), static_cast<int>(current), progressString);
 
-        const auto dataChunkSize = (address + chunkSize) > dataSize ? dataSize % chunkSize : chunkSize;
-
-        programmer->writeData(data.data() + address, address, dataChunkSize);
+        programmer->writeData(data.data() + current, address, std::min(chunkSize, dataSize - current));
     }
 
     emit notifyProgress(0, 0, "Выключение режима программирования");
