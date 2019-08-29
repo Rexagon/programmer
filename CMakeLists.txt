@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
 project(programmer)
 
+option(DEPLOY "Find and deploy all qt binaries" ON)
+
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(SYSTEM_BIT_POSTFIX x64)
 elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)

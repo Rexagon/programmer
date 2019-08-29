@@ -1,10 +1,7 @@
 #!/bin/sh
 
-cwd=`dirname "$0"`
+cwd=$(dirname "$0")
 
-sh $cwd/clean.sh
+sh "$cwd"/clean.sh
 
-git submodule init
-git submodule update
-
-sh $cwd/3rdparty/sitl/build_min.sh
+sh "$cwd"/3rdparty/sitl/build.sh --without-bindings

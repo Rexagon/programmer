@@ -1,8 +1,10 @@
 @echo off
 
-PUSHD %CD%
+pushd %CD%
 call prepare.bat
-POPD
+popd
+
+pushd %CD%
 
 mkdir cmakefiles_gcc
 cd cmakefiles_gcc
@@ -12,3 +14,5 @@ cd programmer
 
 cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release ../../
 cmake --build .
+
+popd

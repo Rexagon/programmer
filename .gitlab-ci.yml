@@ -1,17 +1,28 @@
-stages:
-  - build
+.environment: &environment
+  image: rexagon/cmake-gcc_cpp-boost-python-qt
+  tags:
+    - kpa
+    - docker
+    - debian
 
-.submodule_base: &submodule
+.submodule: &submodule
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
 
+
+stages:
+  - build
+
 build_develop:
+  <<: *environment
   <<: *submodule
   stage: build
   only:
     - develop
   script:
     - sh build.sh
+    - cp -r ~/qtdist/* build/
+    - cp sitl/dist/bin/*.dll build/
   artifacts:
     paths:
       - build

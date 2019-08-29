@@ -1,11 +1,24 @@
-#!/bin/sh
+#!/bin/bash
 
-cwd=`dirname "$0"`
+cwd=$(dirname "$0")
 
-sh $cwd/prepare.sh
+sh "$cwd"/prepare.sh
 
-mkdir -p $cwd/cmakefiles_gcc/programmer
-cd $cwd/cmakefiles_gcc/programmer
+withoutDeployment=0
+for var in "$@"
+do
+    [ "$var" = "--without-deployment" ] && withoutDeployment=1
+done
 
-cmake -DCMAKE_TOOLCHAIN_FILE=~/mingw-w64-i686.cmake -DCMAKE_BUILD_TYPE=Release ../../
+additionalParameters=""
+[ $withoutDeployment -eq 1 ] && additionalParameters="$additionalParameters -DDEPLOY=OFF"
+
+mkdir -p "$cwd"/cmakefiles_gcc/programmer
+cd "$cwd"/cmakefiles_gcc/programmer || exit
+
+cmake -DCMAKE_TOOLCHAIN_FILE=~/mingw-w64-i686.cmake \
+      -DCMAKE_BUILD_TYPE=Release \
+      $additionalParameters \
+      ../../
+
 cmake --build .
