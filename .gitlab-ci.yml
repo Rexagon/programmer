@@ -1,5 +1,5 @@
 .environment: &environment
-  image: rexagon/cmake-gcc_cpp-boost-python-qt
+  image: $DOCKERHUB/kpa/cmake-gcc_cpp-boost-python-qt
   tags:
     - kpa
     - docker
@@ -22,7 +22,7 @@ build_develop:
   script:
     - sh build.sh --without-deployment
     - cp -r ~/qtdist/* build/
-    - cp sitl/dist/bin/*.dll build/
+    - cp 3rdparty/sitl/dist/bin/*.dll build/
   artifacts:
     paths:
       - build
