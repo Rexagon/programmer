@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(programmer)
 
-option(DEPLOY "Find and deploy all qt binaries" ON)
+option(WIN_DEPLOY "Find and deploy all dlls for windows (works only on windows)" ON)
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(SYSTEM_BIT_POSTFIX x64)

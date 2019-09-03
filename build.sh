@@ -11,7 +11,7 @@ do
 done
 
 additionalParameters=""
-[ $withoutDeployment -eq 1 ] && additionalParameters="$additionalParameters -DDEPLOY=OFF"
+[ $withoutDeployment -eq 1 ] && additionalParameters="$additionalParameters -DWIN_DEPLOY=OFF"
 
 mkdir -p "$cwd"/cmakefiles_gcc/programmer
 cd "$cwd"/cmakefiles_gcc/programmer || exit

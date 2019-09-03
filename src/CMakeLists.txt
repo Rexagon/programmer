@@ -95,9 +95,10 @@ elseif()
     set(DEPLOYMENT_FLAGS --no-quick-import --no-translations --debug)
 endif()
 
-if (DEPLOY)
+add_custom_command(TARGET programmer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EXTLIBS_DIR}/sitl/dist/bin/libsitl.dll ${BUILD_OUTPUT_DIR}/)
+
+if (WIN_DEPLOY)
     add_custom_command(TARGET programmer POST_BUILD
-        COMMAND ${WINDEPLOYQT_EXE} ${DEPLOYMENT_FLAGS} ${BUILD_OUTPUT_DIR}/programmer.exe
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EXTLIBS_DIR}/sitl/dist/bin/libsitl.dll ${BUILD_OUTPUT_DIR}/
-    )
+        COMMAND ${WINDEPLOYQT_EXE} ${DEPLOYMENT_FLAGS} ${BUILD_OUTPUT_DIR}/programmer.exe)
 endif()
