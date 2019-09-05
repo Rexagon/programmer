@@ -1,6 +1,8 @@
 #ifndef PROGRAMMER_SRC_OPERATIONS_VERIFY_H_
 #define PROGRAMMER_SRC_OPERATIONS_VERIFY_H_
 
+#include <QFile>
+
 #include "Operation.h"
 
 namespace app
@@ -19,7 +21,8 @@ public:
     QString getDescription() const override;
 
 private:
-    QString m_fileName;
+    QFile m_file;
+    std::pair<size_t, size_t> m_range = {0, 0};
 };
 
 } // namespace app
