@@ -50,23 +50,22 @@ void Dump::run()
     size_t current = 0;
     for (const auto &sector : sectors)
     {
-        if (sector.selected)
+        if (!sector.selected)
         {
             chunks.emplace_back(sector.size, 0xffu);
+            current += sector.size;
+            continue;
         }
-        else
+
+        for (auto address = sector.address; address < sector.address + sector.size; address += chunkSize)
         {
-            for (auto address = sector.address; address < sector.address + sector.size; address += chunkSize)
-            {
-                const auto progressString = QString("Скопировано байт: %L1 из %L2").arg(current).arg(total);
-                emit notifyProgress(static_cast<int>(total), static_cast<int>(current), progressString);
+            const auto progressString = QString("Скопировано байт: %L1 из %L2").arg(current).arg(total);
+            emit notifyProgress(static_cast<int>(total), static_cast<int>(current), progressString);
 
-                chunks.emplace_back();
-                getProgrammer()->readData(chunks.back(), address, chunkSize);
-            }
+            chunks.emplace_back();
+            getProgrammer()->readData(chunks.back(), address, chunkSize);
+            current += chunkSize;
         }
-
-        current += sector.size;
     }
 
     // Запись в файл
@@ -75,7 +74,7 @@ void Dump::run()
     {
         const auto progressString = QString("Запись в файл: %1 / %2").arg(currentChunk + 1).arg(chunks.size());
         emit notifyProgress(static_cast<int>(chunks.size()), currentChunk, progressString);
-        ++current;
+        ++currentChunk;
 
         m_file.write(reinterpret_cast<const char *>(chunk.data()), static_cast<qint64>(chunk.size()));
     }

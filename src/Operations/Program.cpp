@@ -77,9 +77,6 @@ void Program::run()
 
     const auto data = m_file.readAll();
     const auto dataSize = static_cast<size_t>(data.size());
-    const size_t chunkCount = dataSize / chunkSize + ((dataSize % chunkSize) > 0);
-
-    printf("Data size: %u\nChunk count: %u\nReal chunk count: %u\n", dataSize, chunkCount, dataSize / chunkSize);
 
     // Программирование
     emit notifyProgress(0, 0, "Включение режима программирования");
