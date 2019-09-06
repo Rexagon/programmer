@@ -23,10 +23,28 @@ public:
      */
     explicit MainWindowUI(SectorTableModel &model, QMainWindow *window);
 
+    /**
+     * @brief       Устанавливает набор отображаемых элементов
+     *              в зависимости от режима отображения
+     *
+     * @param mode  Режим отображения
+     */
     void setViewMode(ViewMode mode);
 
+    /**
+     * @brief       Устанавливает набор отображаемых элементов
+     *              в зависимости от состояния подключения
+     *
+     * @param state Состояние подключения
+     */
     void setConnectionState(ConnectionState state);
 
+    /**
+     * @brief       Устанавливает набор отображаемых элементов
+     *              в зависимости от состояния приложения
+     *
+     * @param state Состояние приложения
+     */
     void setApplicationState(ApplicationState state);
 
     /**
@@ -34,12 +52,29 @@ public:
      */
     ConnectionWidget *getConnectionWidget() const;
 
+    /**
+     * @return  Кнопка переключения режимов отображения
+     */
     LinkButton *getViewModeToggle() const;
 
+    /**
+     * @return  Кнопка операции считывания
+     */
     QPushButton *getDumpButton() const;
+
+    /**
+     * @return  Кнопка операции очистки
+     */
     QPushButton *getClearButton() const;
 
+    /**
+     * @return  Кнопка операции проверки
+     */
     QPushButton *getVerifyButton() const;
+
+    /**
+     * @return  Кнопка операции записи
+     */
     QPushButton *getWriteButton() const;
 
 public:

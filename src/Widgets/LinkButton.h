@@ -5,12 +5,17 @@
 
 namespace app
 {
+/**
+ * @brief   Кликабельная ссылка
+ */
 class LinkButton final : public QLabel
 {
     Q_OBJECT
 
 public:
     /**
+     * @param parent    Родительский виджет
+     */
     explicit LinkButton(QWidget *parent);
 
 signals:

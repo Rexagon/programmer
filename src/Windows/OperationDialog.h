@@ -12,6 +12,9 @@
 
 namespace app
 {
+/**
+ * @brief   Диалог для операций
+ */
 class OperationDialog : public QDialog
 {
     Q_OBJECT
@@ -24,6 +27,10 @@ public:
         CONCLUSION
     };
 
+    /**
+     * @param operation Объект операции
+     * @param parent    Родительский виджет
+     */
     explicit OperationDialog(std::unique_ptr<Operation> operation, QWidget *parent = nullptr);
 
 public:

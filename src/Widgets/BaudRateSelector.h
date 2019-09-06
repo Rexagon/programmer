@@ -5,12 +5,17 @@
 
 namespace app
 {
+/**
+ * @brief   Виджет для выбора стандартных скоростей COM порта
+ */
 class BaudRateSelector : public QComboBox
 {
     Q_OBJECT
 
 public:
     /**
+     * @param parent    Родительский виджет
+     */
     explicit BaudRateSelector(QWidget *parent);
 };
 

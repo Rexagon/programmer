@@ -7,11 +7,17 @@
 
 namespace app
 {
+/**
+ * @brief   Виджет для выбора COM порта
+ */
 class SerialPortSelector final : public QComboBox
 {
     Q_OBJECT
 
 public:
+    /**
+     * @param parent    Родительский виджет
+     */
     explicit SerialPortSelector(QWidget *parent);
 
 protected:

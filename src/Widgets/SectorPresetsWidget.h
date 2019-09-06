@@ -10,6 +10,9 @@
 
 namespace app
 {
+/**
+ * @brief   Виджет для упрощённого выбора секторов
+ */
 class SectorPresetsWidget : public QWidget
 {
     Q_OBJECT
