@@ -13,10 +13,13 @@ class SectorTableWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit SectorTableWidget(QWidget *parent);
+    /**
+     * @param model     Таблица секторов
+     * @param parent    Родительский виджет
+     */
+    explicit SectorTableWidget(SectorTableModel &model, QWidget *parent);
 
-    void setModel(SectorTableModel *model);
-
+public:
     SectorTableWidget(const SectorTableWidget &) = delete;
     SectorTableWidget &operator=(const SectorTableWidget &) = delete;
     SectorTableWidget(SectorTableWidget &&) noexcept = delete;
@@ -24,6 +27,7 @@ public:
 
 private:
     void createUI();
+    void setModel(SectorTableModel &model);
 
     QTableView *m_tableView = nullptr;
 };

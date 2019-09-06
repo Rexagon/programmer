@@ -21,7 +21,7 @@ public:
      * @param model         Таблица секотров
      * @param fileName      Путь к файлу с прошивкой
      */
-    explicit Program(Programmer *programmer, SectorTableModel *model, const QString &fileName);
+    explicit Program(Programmer &programmer, const SectorTableModel &model, const QString &fileName);
 
     /**
      * @brief   Проверяет, что выбран хотя бы один сектор,

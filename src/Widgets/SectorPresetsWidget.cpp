@@ -50,43 +50,11 @@ Qt::CheckState calculateCheckState(const std::vector<app::SectorTableModel::Sect
 
 namespace app
 {
-SectorPresetsWidget::SectorPresetsWidget(QWidget *parent)
+SectorPresetsWidget::SectorPresetsWidget(SectorTableModel &model, QWidget *parent)
     : QWidget{parent}
 {
     createUI();
-}
-
-
-void SectorPresetsWidget::setModel(app::SectorTableModel *model)
-{
-    assert(m_model == nullptr);
-
-    m_model = model;
-
-    for (auto &preset : m_presets)
-    {
-        connect(preset.checkBox, &QCheckBox::stateChanged, [this, &preset](int state) {
-            switch (state)
-            {
-                case Qt::CheckState::Checked:
-                    m_model->setItemsSelected(preset.sectors, true);
-                    break;
-
-                case Qt::CheckState::Unchecked:
-                    m_model->setItemsSelected(preset.sectors, false);
-                    preset.checkBox->setTristate(false);
-                    break;
-
-                default:
-                    break;
-            }
-        });
-
-        connect(m_model, &QAbstractItemModel::dataChanged, [this, &preset]() {
-            const auto state = m_model->getItems(preset.sectors);
-            preset.checkBox->setCheckState(calculateCheckState(state));
-        });
-    }
+    setModel(model);
 }
 
 
@@ -108,6 +76,35 @@ void SectorPresetsWidget::createUI()
         layout->addWidget(checkBox);
 
         m_presets.emplace_back(Preset{checkBox, copy.second});
+    }
+}
+
+
+void SectorPresetsWidget::setModel(SectorTableModel &model)
+{
+    for (auto &preset : m_presets)
+    {
+        connect(preset.checkBox, &QCheckBox::stateChanged, [&model, &preset](int state) {
+            switch (state)
+            {
+                case Qt::CheckState::Checked:
+                    model.setItemsSelected(preset.sectors, true);
+                    break;
+
+                case Qt::CheckState::Unchecked:
+                    model.setItemsSelected(preset.sectors, false);
+                    preset.checkBox->setTristate(false);
+                    break;
+
+                default:
+                    break;
+            }
+        });
+
+        connect(&model, &QAbstractItemModel::dataChanged, [&model, &preset]() {
+            const auto state = model.getItems(preset.sectors);
+            preset.checkBox->setCheckState(calculateCheckState(state));
+        });
     }
 }
 

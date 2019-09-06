@@ -18,7 +18,7 @@ public:
      * @param model         Таблица секторов
      * @param fileName      Путь к файлу, в который будет записан результат
      */
-    explicit Dump(Programmer *programmer, SectorTableModel *model, const QString &fileName);
+    explicit Dump(Programmer &programmer, const SectorTableModel &model, const QString &fileName);
 
     /**
      * @brief   Проверяет, что выбран хотя бы один сектор

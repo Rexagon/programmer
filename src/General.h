@@ -42,8 +42,7 @@ enum class ConnectionState
 enum class ApplicationState
 {
     DISCONNECTED,
-    CONNECTED,
-    FILE_SELECTED
+    CONNECTED
 };
 
 } // namespace app

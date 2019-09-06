@@ -16,7 +16,7 @@ constexpr auto WINDOW_WIDTH_MIN = 275;
 
 namespace app
 {
-MainWindowUI::MainWindowUI(QMainWindow *window)
+MainWindowUI::MainWindowUI(SectorTableModel &model, QMainWindow *window)
     : m_window{window}
 {
     m_window->setWindowTitle("Программатор");
@@ -26,7 +26,7 @@ MainWindowUI::MainWindowUI(QMainWindow *window)
     auto *layout = new QVBoxLayout(container);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    layout->addWidget(createTopWorkspace());
+    layout->addWidget(createTopWorkspace(model));
     layout->addWidget(createBottomWorkspace());
 
     m_window->setCentralWidget(container);
@@ -60,13 +60,6 @@ void MainWindowUI::setApplicationState(ApplicationState state)
     m_clearButton->setEnabled(state != ApplicationState::DISCONNECTED);
     m_verifyButton->setEnabled(state != ApplicationState::DISCONNECTED);
     m_writeButton->setEnabled(state != ApplicationState::DISCONNECTED);
-}
-
-
-void MainWindowUI::setSectorsTableModel(SectorTableModel *model)
-{
-    m_sectorPresets->setModel(model);
-    m_sectorTable->setModel(model);
 }
 
 
@@ -106,7 +99,7 @@ QPushButton *MainWindowUI::getWriteButton() const
 }
 
 
-QWidget *MainWindowUI::createTopWorkspace()
+QWidget *MainWindowUI::createTopWorkspace(SectorTableModel &model)
 {
     auto *container = new QWidget(m_window);
     auto *layout = new QVBoxLayout(container);
@@ -126,7 +119,7 @@ QWidget *MainWindowUI::createTopWorkspace()
     auto *sectorPresetsContainer = new QWidget(m_window);
     auto *sectorPresetsLayout = new QVBoxLayout(sectorPresetsContainer);
 
-    m_sectorPresets = new SectorPresetsWidget(m_window);
+    m_sectorPresets = new SectorPresetsWidget(model, m_window);
     sectorPresetsLayout->addWidget(m_sectorPresets);
     sectorPresetsLayout->addStretch();
 
@@ -136,7 +129,7 @@ QWidget *MainWindowUI::createTopWorkspace()
     auto *sectorsTableContainer = new QWidget(m_window);
     auto *sectorsTableLayout = new QVBoxLayout(sectorsTableContainer);
 
-    m_sectorTable = new SectorTableWidget(m_window);
+    m_sectorTable = new SectorTableWidget(model, m_window);
     sectorsTableLayout->addWidget(m_sectorTable);
 
     m_sectorsSelectionWrapper->addWidget(sectorsTableContainer);

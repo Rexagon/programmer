@@ -11,7 +11,7 @@ using namespace std::chrono_literals;
 
 namespace app
 {
-Program::Program(Programmer *programmer, SectorTableModel *model, const QString &fileName)
+Program::Program(Programmer &programmer, const SectorTableModel &model, const QString &fileName)
     : Operation{programmer, model, "Запись прошивки"}
     , m_file{fileName}
 {
@@ -59,7 +59,7 @@ void Program::run()
 {
     const size_t chunkSize = 1024;
     const auto &begin = m_range.first;
-    const auto &programmer = getProgrammer();
+
     const auto &selectedSectors = getSelectedSectors();
 
     // Очистка секторов
@@ -68,7 +68,7 @@ void Program::run()
         emit notifyProgress(static_cast<int>(selectedSectors.size()), static_cast<int>(i),
                             QString("Очищено секторов: %1 из %2").arg(i).arg(selectedSectors.size()));
 
-        getProgrammer()->clearSector(selectedSectors[i]);
+        getProgrammer().clearSector(selectedSectors[i]);
     }
 
 
@@ -80,7 +80,7 @@ void Program::run()
 
     // Программирование
     emit notifyProgress(0, 0, "Включение режима программирования");
-    programmer->enableProgramming();
+    getProgrammer().enableProgramming();
 
     for (auto address = begin; address < begin + dataSize; address += chunkSize)
     {
@@ -89,11 +89,11 @@ void Program::run()
 
         emit notifyProgress(static_cast<int>(dataSize), static_cast<int>(current), progressString);
 
-        programmer->writeData(data.data() + current, address, std::min(chunkSize, dataSize - current));
+        getProgrammer().writeData(data.data() + current, address, std::min(chunkSize, dataSize - current));
     }
 
     emit notifyProgress(0, 0, "Выключение режима программирования");
-    programmer->disableProgramming();
+    getProgrammer().disableProgramming();
 
     // Готово
     emit notifyProgress(1, 1, "Готово");

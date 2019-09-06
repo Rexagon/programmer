@@ -10,7 +10,8 @@ class LinkButton final : public QLabel
     Q_OBJECT
 
 public:
-    explicit LinkButton(QWidget *parent = nullptr);
+    /**
+    explicit LinkButton(QWidget *parent);
 
 signals:
     void clicked();

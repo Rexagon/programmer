@@ -8,7 +8,7 @@
 
 namespace app
 {
-Clear::Clear(Programmer *programmer, SectorTableModel *model)
+Clear::Clear(Programmer &programmer, const SectorTableModel &model)
     : Operation{programmer, model, "Очистка"}
 {
 }
@@ -36,7 +36,7 @@ void Clear::run()
         emit notifyProgress(static_cast<int>(selectedSectors.size()), static_cast<int>(i),
                             QString("Очищено секторов: %1 из %2").arg(i).arg(selectedSectors.size()));
 
-        getProgrammer()->clearSector(selectedSectors[i]);
+        getProgrammer().clearSector(selectedSectors[i]);
     }
 
 

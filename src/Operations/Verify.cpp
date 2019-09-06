@@ -33,7 +33,7 @@ std::optional<size_t> compare(const void *first, const void *second, const size_
 
 namespace app
 {
-Verify::Verify(Programmer *programmer, SectorTableModel *model, const QString &fileName)
+Verify::Verify(Programmer &programmer, const SectorTableModel &model, const QString &fileName)
     : Operation{programmer, model, "Проверка"}
     , m_file{fileName}
 {
@@ -81,7 +81,6 @@ void Verify::run()
     std::vector<uint8_t> chunk{};
 
     const auto &begin = m_range.first;
-    const auto &programmer = getProgrammer();
 
     // Чтение файла
     emit notifyProgress(0, 0, "Чтение файла");
@@ -95,7 +94,7 @@ void Verify::run()
         const auto current = address - begin;
         const auto progressString = QString("Проверено байт: %L1 из %L2").arg(current).arg(dataSize);
 
-        programmer->readData(chunk, address, chunkSize);
+        getProgrammer().readData(chunk, address, chunkSize);
 
         const auto mismatch = compare(data.data() + current, chunk.data(), chunkSize);
         if (mismatch)

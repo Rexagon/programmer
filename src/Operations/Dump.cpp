@@ -8,7 +8,7 @@
 
 namespace app
 {
-Dump::Dump(app::Programmer *programmer, app::SectorTableModel *model, const QString &fileName)
+Dump::Dump(Programmer &programmer, const SectorTableModel &model, const QString &fileName)
     : Operation{programmer, model, "Считывание"}
     , m_file{fileName}
 {
@@ -37,7 +37,7 @@ void Dump::run()
 
     // Считывание в память
     std::list<std::vector<uint8_t>> chunks;
-    const auto sectors = getSectorTableModel()->getItems();
+    const auto sectors = getSectorTableModel().getItems();
 
     // Считаем сколько надо всего прочитать
     size_t total = 0;
@@ -63,7 +63,7 @@ void Dump::run()
             emit notifyProgress(static_cast<int>(total), static_cast<int>(current), progressString);
 
             chunks.emplace_back();
-            getProgrammer()->readData(chunks.back(), address, chunkSize);
+            getProgrammer().readData(chunks.back(), address, chunkSize);
             current += chunkSize;
         }
     }

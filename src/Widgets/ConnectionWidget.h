@@ -17,7 +17,8 @@ class ConnectionWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ConnectionWidget(QWidget *parent = nullptr);
+    /**
+    explicit ConnectionWidget(QWidget *parent);
 
     void setViewMode(ViewMode mode);
 
@@ -32,6 +33,7 @@ public:
     BaudRateSelector *getBaudRateSelector() const;
     QPushButton *getConnectionToggleButton() const;
 
+public:
     ConnectionWidget(const ConnectionWidget &) = delete;
     ConnectionWidget &operator=(const ConnectionWidget &) = delete;
     ConnectionWidget(ConnectionWidget &&) noexcept = delete;

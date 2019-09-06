@@ -15,7 +15,7 @@ public:
      * @param programmer    Объект подключения к программатору
      * @param model         Таблица секторов
      */
-    explicit Clear(Programmer *programmer, SectorTableModel *model);
+    explicit Clear(Programmer &programmer, const SectorTableModel &model);
 
     /**
      * @brief   Проверяет, что выбран хотя бы один сектор

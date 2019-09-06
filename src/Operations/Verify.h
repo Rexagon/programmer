@@ -20,7 +20,7 @@ public:
      * @param model         Таблица секторов
      * @param fileName      Путь к файлу с прошивкой
      */
-    explicit Verify(Programmer *programmer, SectorTableModel *model, const QString &fileName);
+    explicit Verify(Programmer &programmer, const SectorTableModel &model, const QString &fileName);
 
     /**
      * @brief   Проверяет, что выбран хотя бы один сектор,

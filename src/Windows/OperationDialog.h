@@ -26,6 +26,7 @@ public:
 
     explicit OperationDialog(std::unique_ptr<Operation> operation, QWidget *parent = nullptr);
 
+public:
     OperationDialog(const OperationDialog &) = delete;
     OperationDialog &operator=(const OperationDialog &) = delete;
     OperationDialog(OperationDialog &&) noexcept = delete;

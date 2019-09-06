@@ -28,7 +28,7 @@ namespace app
 {
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow{parent}
-    , m_ui{this}
+    , m_ui{m_sectorsTableModel, this}
     , m_viewMode{DEFAULT_VIEW_MODE}
     , m_connectionState{DEFAULT_CONNECTION_STATE}
     , m_applicationState{DEFAULT_APPLICATION_STATE}
@@ -36,7 +36,6 @@ MainWindow::MainWindow(QWidget *parent)
     createFileDialog();
 
     syncState();
-    m_ui.setSectorsTableModel(&m_sectorsTableModel);
 
     connectSignals();
 }
@@ -90,7 +89,7 @@ void MainWindow::disconnectProgrammer()
 void MainWindow::runVerifyOperation()
 {
     selectFile([this](const QString &file) {
-        runOperation(std::make_unique<Verify>(m_programmer.get(), &m_sectorsTableModel, file));
+        runOperation(std::make_unique<Verify>(*m_programmer, m_sectorsTableModel, file));
     });
 }
 
@@ -98,7 +97,7 @@ void MainWindow::runVerifyOperation()
 void MainWindow::runWriteOperation()
 {
     selectFile([this](const QString &file) {
-        runOperation(std::make_unique<Program>(m_programmer.get(), &m_sectorsTableModel, file));
+        runOperation(std::make_unique<Program>(*m_programmer, m_sectorsTableModel, file));
     });
 }
 
@@ -106,14 +105,14 @@ void MainWindow::runWriteOperation()
 void MainWindow::runDumpOperation()
 {
     selectFile([this](const QString &file) {
-        runOperation(std::make_unique<Dump>(m_programmer.get(), &m_sectorsTableModel, file));
+        runOperation(std::make_unique<Dump>(*m_programmer, m_sectorsTableModel, file));
     });
 }
 
 
 void MainWindow::runClearOperation()
 {
-    runOperation(std::make_unique<Clear>(m_programmer.get(), &m_sectorsTableModel));
+    runOperation(std::make_unique<Clear>(*m_programmer, m_sectorsTableModel));
 }
 
 

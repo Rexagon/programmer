@@ -20,6 +20,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override = default;
 
+public:
     MainWindow(const MainWindow &) = delete;
     MainWindow &operator=(const MainWindow &) = delete;
     MainWindow(MainWindow &&) noexcept = delete;
@@ -44,14 +45,14 @@ private:
     void connectSignals();
     void syncState();
 
+    SectorTableModel m_sectorsTableModel{};
+    std::unique_ptr<Programmer> m_programmer{};
+
     MainWindowUI m_ui;
 
     ViewMode m_viewMode;
     ConnectionState m_connectionState;
     ApplicationState m_applicationState;
-
-    std::unique_ptr<Programmer> m_programmer{};
-    SectorTableModel m_sectorsTableModel{};
 
     QFileDialog *m_fileDialog = nullptr;
 };

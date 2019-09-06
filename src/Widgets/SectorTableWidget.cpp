@@ -15,23 +15,11 @@ constexpr auto TABLE_HEIGHT_MIN = 144;
 
 namespace app
 {
-SectorTableWidget::SectorTableWidget(QWidget *parent)
+SectorTableWidget::SectorTableWidget(SectorTableModel &model, QWidget *parent)
     : QWidget{parent}
 {
     createUI();
-}
-
-
-void SectorTableWidget::setModel(SectorTableModel *model)
-{
-    assert(m_tableView->model() == nullptr);
-
-    m_tableView->setModel(model);
-
-    m_tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
-    m_tableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-    m_tableView->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
-    m_tableView->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    setModel(model);
 }
 
 
@@ -46,6 +34,17 @@ void SectorTableWidget::createUI()
     m_tableView->verticalHeader()->setVisible(false);
     m_tableView->setMinimumHeight(TABLE_HEIGHT_MIN);
     layout->addWidget(m_tableView);
+}
+
+
+void SectorTableWidget::setModel(SectorTableModel &model)
+{
+    m_tableView->setModel(&model);
+
+    m_tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    m_tableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    m_tableView->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+    m_tableView->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
 }
 
 } // namespace app

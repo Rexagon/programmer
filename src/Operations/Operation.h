@@ -24,7 +24,7 @@ public:
      * @param model         Таблица секторов
      * @param name          Название операции
      */
-    explicit Operation(Programmer *programmer, SectorTableModel *model, const QString &name);
+    explicit Operation(Programmer &programmer, const SectorTableModel &model, const QString &name);
 
     /**
      * @brief   Проверяет возможность выполнения операции
@@ -67,16 +67,16 @@ signals:
     void notifyComplete(bool success = true);
 
 protected:
-    Programmer *getProgrammer() const;
-    SectorTableModel *getSectorTableModel() const;
+    Programmer &getProgrammer() const;
+    const SectorTableModel &getSectorTableModel() const;
 
     const std::vector<SectorTableModel::Sector> &getSelectedSectors() const;
 
 private:
     QString m_name;
 
-    Programmer *m_programmer;
-    SectorTableModel *m_sectorTableModel;
+    Programmer &m_programmer;
+    const SectorTableModel &m_sectorTableModel;
 
     std::vector<SectorTableModel::Sector> m_selectedSectors;
 };

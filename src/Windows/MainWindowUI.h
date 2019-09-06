@@ -17,7 +17,11 @@ namespace app
 class MainWindowUI final
 {
 public:
-    explicit MainWindowUI(QMainWindow *window = nullptr);
+    /**
+     * @param model     Таблица секторов
+     * @param window    Родительское окно
+     */
+    explicit MainWindowUI(SectorTableModel &model, QMainWindow *window);
 
     void setViewMode(ViewMode mode);
 
@@ -25,8 +29,9 @@ public:
 
     void setApplicationState(ApplicationState state);
 
-    void setSectorsTableModel(SectorTableModel *model);
-
+    /**
+     * @return  Виджет подключения к программатору
+     */
     ConnectionWidget *getConnectionWidget() const;
 
     LinkButton *getViewModeToggle() const;
@@ -37,13 +42,14 @@ public:
     QPushButton *getVerifyButton() const;
     QPushButton *getWriteButton() const;
 
+public:
     MainWindowUI(const MainWindowUI &) = delete;
     MainWindowUI &operator=(const MainWindowUI &) = delete;
     MainWindowUI(MainWindowUI &&) noexcept = delete;
     MainWindowUI &operator=(MainWindowUI &&) noexcept = delete;
 
 private:
-    QWidget *createTopWorkspace();
+    QWidget *createTopWorkspace(SectorTableModel &model);
     QWidget *createBottomWorkspace();
 
     QMainWindow *m_window;

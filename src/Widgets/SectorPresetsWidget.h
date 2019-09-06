@@ -21,10 +21,13 @@ class SectorPresetsWidget : public QWidget
     };
 
 public:
-    explicit SectorPresetsWidget(QWidget *parent = nullptr);
+    /**
+     * @param model     Таблица секторов
+     * @param parent    Родительский виджет
+     */
+    explicit SectorPresetsWidget(SectorTableModel &model, QWidget *parent);
 
-    void setModel(SectorTableModel *model);
-
+public:
     SectorPresetsWidget(const SectorPresetsWidget &) = delete;
     SectorPresetsWidget &operator=(const SectorPresetsWidget &) = delete;
     SectorPresetsWidget(SectorPresetsWidget &&) noexcept = delete;
@@ -32,10 +35,9 @@ public:
 
 private:
     void createUI();
+    void setModel(SectorTableModel &model);
 
     std::vector<Preset> m_presets{};
-
-    SectorTableModel *m_model = nullptr;
 };
 
 } // namespace app

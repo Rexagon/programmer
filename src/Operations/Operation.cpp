@@ -6,11 +6,11 @@
 
 namespace app
 {
-Operation::Operation(Programmer *programmer, SectorTableModel *model, const QString &name)
+Operation::Operation(Programmer &programmer, const SectorTableModel &model, const QString &name)
     : m_name{name}
     , m_programmer{programmer}
     , m_sectorTableModel{model}
-    , m_selectedSectors{(assert(model != nullptr), model->getSelectedItems())}
+    , m_selectedSectors{model.getSelectedItems()}
 {
 }
 
@@ -21,13 +21,13 @@ const QString &Operation::getName() const
 }
 
 
-Programmer* Operation::getProgrammer() const
+Programmer &Operation::getProgrammer() const
 {
     return m_programmer;
 }
 
 
-SectorTableModel* Operation::getSectorTableModel() const
+const SectorTableModel &Operation::getSectorTableModel() const
 {
     return m_sectorTableModel;
 }

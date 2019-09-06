@@ -210,7 +210,7 @@ void Programmer::setWritingTimings(const uint8_t setup, const uint8_t active, co
 {
     using namespace timings;
 
-    assert(WRITE_SETUP.check(value) && WRITE_ACTIVE.check(active) && WRITE_HOLD.check(hold));
+    assert(WRITE_SETUP.check(setup) && WRITE_ACTIVE.check(active) && WRITE_HOLD.check(hold));
     m_writingTimings = {setup, active, hold};
 }
 
@@ -219,7 +219,7 @@ void Programmer::setReadingTimings(const uint8_t setup, const uint8_t active, co
 {
     using namespace timings;
 
-    assert(READ_SETUP.check(value) && READ_ACTIVE.check(active) && READ_HOLD.check(hold));
+    assert(READ_SETUP.check(setup) && READ_ACTIVE.check(active) && READ_HOLD.check(hold));
     m_readingTimings = {setup, active, hold};
 }
 
