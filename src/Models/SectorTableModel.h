@@ -5,6 +5,9 @@
 
 namespace app
 {
+/**
+ * @brief   Модель данных для таблицы секторов
+ */
 class SectorTableModel : public QAbstractTableModel
 {
     Q_OBJECT
@@ -30,12 +33,38 @@ public:
         bool selected;
     };
 
+    /**
+     *
+     * @brief Создаёт таблицу из 19 секторов
+     *
+     * @param parent    Родительский QObject
+     */
     explicit SectorTableModel(QObject *parent = nullptr);
 
+    /**
+     * @brief           Отмечает секторы с указанными индексами
+     * @param items     Индексы секторов
+     * @param selected  true, если помечать секторы как выбранные
+     *                  false, если помечать секторы как не выбранные
+     */
     void setItemsSelected(const std::vector<int> &items, bool selected);
+
+    /**
+     * @brief           Получает секторы из списка идексов
+     * @param items     Индексы секоторов
+     * @return          Секторы в том же порядке, что и переданные индексы
+     *                  этих секторов
+     */
     std::vector<Sector> getItems(const std::vector<int> &items) const;
+
+    /**
+     * @return  Все секторы
+     */
     std::vector<Sector> getItems() const;
 
+    /**
+     * @return  Только выбранные сектора
+     */
     std::vector<Sector> getSelectedItems() const;
 
 protected:
