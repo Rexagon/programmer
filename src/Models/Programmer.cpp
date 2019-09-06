@@ -78,10 +78,12 @@ Programmer::Programmer(const std::string &port, unsigned int baudRate)
 {
     // Проверяем соединение
     m_connection.setResponseTimeout(2);
-    m_connection.execute<List>();
 
     // Получаем описание устройства
     // m_description = m_connection.execute<Iden>();
+
+    // Получаем версию устройства
+    m_version = m_connection.execute<Mrd<uint32_t, uint64_t>>(0x00000u);
 
     reset();
 }
@@ -119,8 +121,15 @@ void Programmer::reset()
 
 void Programmer::readData(std::vector<uint8_t> &data, const size_t begin, const size_t size)
 {
+    if (m_isProgrammingEnabled)
+    {
+        throw std::runtime_error{"Чтение данных невозможно при включённом режиме программирования"};
+    }
+
     if (begin + size > BIVK_DATA_END - BIVK_DATA_BEGIN)
+    {
         throw std::logic_error{"Невозможно считать блок данных"};
+    }
 
     data.reserve(size);
     for (size_t address = begin; address < begin + size; ++address)
@@ -133,10 +142,14 @@ void Programmer::readData(std::vector<uint8_t> &data, const size_t begin, const 
 void Programmer::writeData(const void *data, const size_t begin, const size_t size)
 {
     if (!m_isProgrammingEnabled)
-        throw std::runtime_error{"Режим программирования выключен"};
+    {
+        throw std::runtime_error{"Запись данных невозможна при выключенном режиме программирования"};
+    }
 
     if (begin + size > BIVK_DATA_END - BIVK_DATA_BEGIN)
+    {
         throw std::logic_error{"Невозможно записать блок данных"};
+    }
 
     for (size_t i = 0; i < size; ++i)
     {
@@ -172,6 +185,18 @@ void Programmer::clearSector(const app::SectorTableModel::Sector &sector)
     writeData(0x00AAAu, 0xAAu);
     writeData(0x00555u, 0x55u);
     writeData(sector.address, 0x30u);
+}
+
+
+const std::string &Programmer::getDescription() const
+{
+    return m_description;
+}
+
+
+uint64_t Programmer::getVersion() const
+{
+    return m_version;
 }
 
 
@@ -218,12 +243,6 @@ void Programmer::applyConfiguration()
     READ_HOLD.write(configuration, std::get<2>(m_readingTimings));
 
     setServiceReg(configuration);
-}
-
-
-const std::string &Programmer::getDescription() const
-{
-    return m_description;
 }
 
 
