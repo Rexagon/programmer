@@ -111,6 +111,9 @@ void Programmer::reset()
 
     // Отключаем режим программирования
     disableProgramming();
+
+    // На всякий случай выполняем команду Reset для flash
+    writeData(0x00000u, 0xF0u);
 }
 
 
@@ -147,9 +150,9 @@ void Programmer::enableProgramming()
 {
     m_isProgrammingEnabled = true;
 
-    writeData(0xAAAAAu, 0xAAu);
-    writeData(0x55555u, 0x55u);
-    writeData(0xAAAAAu, 0x20u);
+    writeData(0x00AAAu, 0xAAu);
+    writeData(0x00555u, 0x55u);
+    writeData(0x00AAAu, 0x20u);
 }
 
 
@@ -163,11 +166,11 @@ void Programmer::disableProgramming()
 
 void Programmer::clearSector(const app::SectorTableModel::Sector &sector)
 {
-    writeData(0xAAAAAu, 0xAAu);
-    writeData(0x55555u, 0x55u);
-    writeData(0xAAAAAu, 0x80u);
-    writeData(0xAAAAAu, 0xAAu);
-    writeData(0x55555u, 0x55u);
+    writeData(0x00AAAu, 0xAAu);
+    writeData(0x00555u, 0x55u);
+    writeData(0x00AAAu, 0x80u);
+    writeData(0x00AAAu, 0xAAu);
+    writeData(0x00555u, 0x55u);
     writeData(sector.address, 0x30u);
 }
 
