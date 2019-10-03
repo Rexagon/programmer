@@ -102,8 +102,8 @@ void Programmer::reset()
     setBuffersEnabled(true);
 
     // Устанавливаем тайминги
-    setWritingTimings(4, 6, 4);
-    setReadingTimings(4, 7, 4);
+    setWritingTimings(1, 3, 1);
+    setReadingTimings(2, 7, 1);
 
     // Применяем конфигурацию
     applyConfiguration();
