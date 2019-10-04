@@ -71,6 +71,7 @@ void Program::run()
         getProgrammer().clearSector(selectedSectors[i]);
     }
 
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     // Чтение файла
     emit notifyProgress(0, 0, "Чтение файла");
@@ -81,6 +82,8 @@ void Program::run()
     // Программирование
     emit notifyProgress(0, 0, "Включение режима программирования");
     getProgrammer().enableProgramming();
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     for (auto address = begin; address < begin + dataSize; address += chunkSize)
     {

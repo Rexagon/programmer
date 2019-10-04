@@ -93,11 +93,15 @@ void Programmer::reset()
     setBuffersEnabled(true);
 
     // Устанавливаем тайминги
-    setWritingTimings(1, 3, 1);
-    setReadingTimings(2, 7, 1);
+    /*
+    setWritingTimings(4, 6, 4);
+    setReadingTimings(4, 7, 4);
 
     // Применяем конфигурацию
     applyConfiguration();
+     */
+
+    setServiceReg(0x3005u, true);
 
     // Обнуляем адресный регистр
     setAddressReg(0x0000u, true);
@@ -114,11 +118,13 @@ void Programmer::readData(std::vector<uint8_t> &data, const size_t begin, const 
 {
     if (m_isProgrammingEnabled)
     {
+        printf("Unable to read in programming mode\n");
         throw std::runtime_error{"Чтение данных невозможно при включённом режиме программирования"};
     }
 
     if (begin + size > BIVK_DATA_END - BIVK_DATA_BEGIN)
     {
+        printf("Unable to read block\n");
         throw std::logic_error{"Невозможно считать блок данных"};
     }
 
@@ -127,7 +133,7 @@ void Programmer::readData(std::vector<uint8_t> &data, const size_t begin, const 
     {
         using ReadType = uint64_t;
 
-        const auto result = readData<ReadType>(address);
+        const auto result = readData < ReadType > (address);
 
         for (size_t i = 0; i < sizeof(ReadType); ++i)
         {
@@ -151,22 +157,11 @@ void Programmer::writeData(const void *data, const size_t begin, const size_t si
         throw std::logic_error{"Невозможно записать блок данных"};
     }
 
-    for (size_t i = 0; i < size; ++i)
+    using WriteType = uint32_t;
+    for (size_t i = 0; i * sizeof(WriteType) < size; ++i)
     {
-        using WriteType = uint64_t;
-
         writeData(0x00000, 0xA0A0A0A0u);
-
-        if (i + sizeof(WriteType) <= size)
-        {
-            writeData(begin + i, static_cast<const uint64_t *>(data)[i]);
-            i += sizeof(WriteType);
-        }
-        else
-        {
-            writeData(begin + i, static_cast<const uint8_t *>(data)[i]);
-            ++i;
-        }
+        writeData(begin + i * sizeof(WriteType), *(reinterpret_cast<const WriteType *>(data) + i));
     }
 }
 
@@ -174,6 +169,8 @@ void Programmer::writeData(const void *data, const size_t begin, const size_t si
 void Programmer::enableProgramming()
 {
     m_isProgrammingEnabled = true;
+
+    writeData(0x00000u, 0xF0F0F0F0u);
 
     writeData(0x00AAAu << 2u, 0xAAAAAAAAu);
     writeData(0x00555u << 2u, 0x55555555u);

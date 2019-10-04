@@ -33,7 +33,7 @@ std::optional<QString> Dump::validate()
 
 void Dump::run()
 {
-    const size_t chunkSize = 1024;
+    const size_t chunkSize = 1024u;
 
     // Считывание в память
     std::list<std::vector<uint8_t>> chunks;
@@ -72,6 +72,8 @@ void Dump::run()
     int currentChunk = 0;
     for (const auto &chunk : chunks)
     {
+        printf("Chunk size: %ull\n", chunk.size());
+
         const auto progressString = QString("Запись в файл: %1 / %2").arg(currentChunk + 1).arg(chunks.size());
         emit notifyProgress(static_cast<int>(chunks.size()), currentChunk, progressString);
         ++currentChunk;
