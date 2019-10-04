@@ -123,9 +123,18 @@ void Programmer::readData(std::vector<uint8_t> &data, const size_t begin, const 
     }
 
     data.reserve(size);
-    for (size_t address = begin; address < begin + size; ++address)
+    for (size_t address = begin; address < begin + size;)
     {
-        data.emplace_back(readData<uint8_t>(address));
+        using ReadType = uint64_t;
+
+        const auto result = readData<ReadType>(address);
+
+        for (size_t i = 0; i < sizeof(ReadType); ++i)
+        {
+            data.emplace_back(*(reinterpret_cast<const uint8_t *>(&result) + i));
+        }
+
+        address += sizeof(ReadType);
     }
 }
 
@@ -144,8 +153,20 @@ void Programmer::writeData(const void *data, const size_t begin, const size_t si
 
     for (size_t i = 0; i < size; ++i)
     {
+        using WriteType = uint64_t;
+
         writeData(0x00000, 0xA0A0A0A0u);
-        writeData(begin + i, static_cast<const uint8_t *>(data)[i]);
+
+        if (i + sizeof(WriteType) <= size)
+        {
+            writeData(begin + i, static_cast<const uint64_t *>(data)[i]);
+            i += sizeof(WriteType);
+        }
+        else
+        {
+            writeData(begin + i, static_cast<const uint8_t *>(data)[i]);
+            ++i;
+        }
     }
 }
 
