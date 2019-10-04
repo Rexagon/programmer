@@ -7,7 +7,6 @@
 #include <cassert>
 
 #include <sitl/commands/Iden.h>
-#include <sitl/commands/List.h>
 #include <sitl/commands/Mrd.h>
 #include <sitl/commands/Mwr.h>
 
@@ -153,7 +152,7 @@ void Programmer::writeData(const void *data, const size_t begin, const size_t si
 
     for (size_t i = 0; i < size; ++i)
     {
-        m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN, 0xA0u); // Пишем в любой адрес
+        m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN, 0xA0A0A0A0u); // Пишем в любой адрес
         writeData(begin + i, static_cast<const uint8_t *>(data)[i]);
     }
 }
@@ -163,28 +162,28 @@ void Programmer::enableProgramming()
 {
     m_isProgrammingEnabled = true;
 
-    writeData(0x00AAAu, 0xAAu);
-    writeData(0x00555u, 0x55u);
-    writeData(0x00AAAu, 0x20u);
+    writeData(0x00AAAu << 2u, 0xAAAAAAAAu);
+    writeData(0x00555u << 2u, 0x55555555u);
+    writeData(0x00AAAu << 2u, 0x20202020u);
 }
 
 
 void Programmer::disableProgramming()
 {
     m_isProgrammingEnabled = false;
-    writeData(0x00000u, 0x90u);
-    writeData(0x00000u, 0x00u);
+    writeData(0x00000u, 0x90909090u);
+    writeData(0x00000u, 0x00000000u);
 }
 
 
 void Programmer::clearSector(const app::SectorTableModel::Sector &sector)
 {
-    writeData(0x00AAAu, 0xAAu);
-    writeData(0x00555u, 0x55u);
-    writeData(0x00AAAu, 0x80u);
-    writeData(0x00AAAu, 0xAAu);
-    writeData(0x00555u, 0x55u);
-    writeData(sector.address, 0x30u);
+    writeData(0x00AAAu << 2u, 0xAAAAAAAAu);
+    writeData(0x00555u << 2u, 0x55555555u);
+    writeData(0x00AAAu << 2u, 0x80808080u);
+    writeData(0x00AAAu << 2u, 0xAAAAAAAAu);
+    writeData(0x00555u << 2u, 0x55555555u);
+    writeData(sector.address, 0x30303030u);
 }
 
 
@@ -261,6 +260,15 @@ void Programmer::writeData(uint32_t address, const uint8_t data)
 
     address &= 0x0003FFFFu; // оставляем только 18 разрядов
     m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + address, data);
+}
+
+
+void Programmer::writeData(uint32_t address, const uint32_t data)
+{
+    setAddressReg(static_cast<uint16_t>(address >> 18u));
+
+    address &= 0x0003FFFCu; // оставляем только 18 разрядов и обнуляем последние два
+    m_connection.execute<Mwr<uint32_t, uint32_t>>(BIVK_DATA_BEGIN + address, data);
 }
 
 

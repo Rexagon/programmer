@@ -115,6 +115,7 @@ private:
 
     uint8_t readData(uint32_t address);
     void writeData(uint32_t address, uint8_t data);
+    void writeData(uint32_t address, uint32_t data);
 
     void setServiceReg(uint16_t data, bool force = false);
     void setAddressReg(uint16_t data, bool force = false);
