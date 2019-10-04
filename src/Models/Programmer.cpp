@@ -14,14 +14,6 @@ using namespace sitl::cmds;
 
 namespace
 {
-constexpr uint32_t VERSION_REG = 0x00000000u;
-
-constexpr uint32_t SERVICE_REG = 0x00080000u;
-constexpr uint32_t ADDRESS_REG = 0x00080002u;
-
-constexpr uint32_t BIVK_DATA_BEGIN = 0x00040000u;
-constexpr uint32_t BIVK_DATA_END = 0x0007FFFFu;
-
 void setBits(uint16_t &target, uint16_t value, uint16_t valueMask, uint16_t offset)
 {
     const auto mask = static_cast<uint16_t>(~static_cast<uint16_t>(valueMask << offset));
@@ -133,7 +125,7 @@ void Programmer::readData(std::vector<uint8_t> &data, const size_t begin, const 
     data.reserve(size);
     for (size_t address = begin; address < begin + size; ++address)
     {
-        data.emplace_back(readData(address));
+        data.emplace_back(readData<uint8_t>(address));
     }
 }
 
@@ -152,7 +144,7 @@ void Programmer::writeData(const void *data, const size_t begin, const size_t si
 
     for (size_t i = 0; i < size; ++i)
     {
-        m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN, 0xA0A0A0A0u); // Пишем в любой адрес
+        writeData(0x00000, 0xA0A0A0A0u);
         writeData(begin + i, static_cast<const uint8_t *>(data)[i]);
     }
 }
@@ -242,33 +234,6 @@ void Programmer::applyConfiguration()
     READ_HOLD.write(configuration, std::get<2>(m_readingTimings));
 
     setServiceReg(configuration);
-}
-
-
-uint8_t Programmer::readData(uint32_t address)
-{
-    setAddressReg(static_cast<uint16_t>(address >> 18u));
-
-    address &= 0x0003FFFFu; // оставляем только 18 разрядов
-    return m_connection.execute<Mrd<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + address);
-}
-
-
-void Programmer::writeData(uint32_t address, const uint8_t data)
-{
-    setAddressReg(static_cast<uint16_t>(address >> 18u));
-
-    address &= 0x0003FFFFu; // оставляем только 18 разрядов
-    m_connection.execute<Mwr<uint32_t, uint8_t>>(BIVK_DATA_BEGIN + address, data);
-}
-
-
-void Programmer::writeData(uint32_t address, const uint32_t data)
-{
-    setAddressReg(static_cast<uint16_t>(address >> 18u));
-
-    address &= 0x0003FFFCu; // оставляем только 18 разрядов и обнуляем последние два
-    m_connection.execute<Mwr<uint32_t, uint32_t>>(BIVK_DATA_BEGIN + address, data);
 }
 
 
