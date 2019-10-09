@@ -30,12 +30,9 @@ private:
     void connectProgrammer();
     void disconnectProgrammer();
 
+    void runDumpOperation();
     void runVerifyOperation();
     void runWriteOperation();
-    void runDumpOperation();
-    void runClearOperation();
-
-    void toggleViewMode();
 
     void runOperation(std::unique_ptr<Operation> operation);
 
@@ -50,7 +47,6 @@ private:
 
     MainWindowUI m_ui;
 
-    ViewMode m_viewMode;
     ConnectionState m_connectionState;
     ApplicationState m_applicationState;
 

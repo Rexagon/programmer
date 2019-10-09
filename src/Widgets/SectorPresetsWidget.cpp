@@ -67,8 +67,10 @@ void SectorPresetsWidget::createUI()
     layout->addWidget(label);
 
     //
-    std::vector<std::pair<QString, std::vector<int>>> copies = {{"Копия 1 (Сектора SA0, SA1, SA2, SA3)", {0, 1, 2, 3}},
-                                                                {"Копия 2 (Сектор SA11)", {11}}};
+    std::vector<std::pair<QString, std::vector<int>>> copies = {
+        {"Копия 1 (Сектора SA0, SA1, SA2, SA3)", {0, 1, 2, 3}},
+        {"Копия 2 (Сектор SA11)",                {11}},
+    };
 
     for (const auto &copy : copies)
     {
@@ -84,7 +86,8 @@ void SectorPresetsWidget::setModel(SectorTableModel &model)
 {
     for (auto &preset : m_presets)
     {
-        connect(preset.checkBox, &QCheckBox::stateChanged, [&model, &preset](int state) {
+        connect(preset.checkBox, &QCheckBox::stateChanged, [&model, &preset](int state)
+        {
             switch (state)
             {
                 case Qt::CheckState::Checked:
@@ -101,7 +104,8 @@ void SectorPresetsWidget::setModel(SectorTableModel &model)
             }
         });
 
-        connect(&model, &QAbstractItemModel::dataChanged, [&model, &preset]() {
+        connect(&model, &QAbstractItemModel::dataChanged, [&model, &preset]()
+        {
             const auto state = model.getItems(preset.sectors);
             preset.checkBox->setCheckState(calculateCheckState(state));
         });

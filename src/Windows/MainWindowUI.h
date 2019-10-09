@@ -25,14 +25,6 @@ public:
 
     /**
      * @brief       Устанавливает набор отображаемых элементов
-     *              в зависимости от режима отображения
-     *
-     * @param mode  Режим отображения
-     */
-    void setViewMode(ViewMode mode);
-
-    /**
-     * @brief       Устанавливает набор отображаемых элементов
      *              в зависимости от состояния подключения
      *
      * @param state Состояние подключения
@@ -53,19 +45,9 @@ public:
     ConnectionWidget *getConnectionWidget() const;
 
     /**
-     * @return  Кнопка переключения режимов отображения
-     */
-    LinkButton *getViewModeToggle() const;
-
-    /**
      * @return  Кнопка операции считывания
      */
     QPushButton *getDumpButton() const;
-
-    /**
-     * @return  Кнопка операции очистки
-     */
-    QPushButton *getClearButton() const;
 
     /**
      * @return  Кнопка операции проверки
@@ -91,15 +73,9 @@ private:
 
     ConnectionWidget *m_connectionWidget = nullptr;
 
-    QStackedWidget *m_sectorsSelectionWrapper = nullptr;
     SectorPresetsWidget *m_sectorPresets = nullptr;
-    SectorTableWidget *m_sectorTable = nullptr;
-
-    LinkButton *m_viewModeToggle = nullptr;
 
     QPushButton *m_dumpButton = nullptr;
-    QPushButton *m_clearButton = nullptr;
-
     QPushButton *m_verifyButton = nullptr;
     QPushButton *m_writeButton = nullptr;
 };

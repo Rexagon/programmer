@@ -29,7 +29,6 @@ std::optional<QString> Program::validate()
 
     m_range = {selectedSectors.front().address, 0};
 
-    // TODO: придумать что делать если выбраны области для ПО1 и ПО2
     for (auto it = selectedSectors.begin(); it != selectedSectors.end(); ++it)
     {
         m_range.second += it->size;

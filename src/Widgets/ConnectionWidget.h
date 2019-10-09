@@ -27,17 +27,6 @@ public:
 
     /**
      * @brief       Устанавливает набор отображаемых полей в
-     *              зависимости от режима отображения
-     *
-     * При @a ViewMode::Compact скрывается поля связанные
-     * с выбором скорости подключения.
-     *
-     * @param mode  Режим отображения
-     */
-    void setViewMode(ViewMode mode);
-
-    /**
-     * @brief       Устанавливает набор отображаемых полей в
      *              зависимости от состояния подключения
      *
      * @param state Состояние подключения
@@ -61,19 +50,9 @@ public:
     QSerialPortInfo getSelectedSerialPort() const;
 
     /**
-     * @return  Ввыбранная скорость подключения
-     */
-    qint32 getSelectedBaudRate() const;
-
-    /**
      * @return  Виджет выбора COM порта
      */
     SerialPortSelector *getSerialPortSelector() const;
-
-    /**
-     * @return  Виджет выбора скорости подключения
-     */
-    BaudRateSelector *getBaudRateSelector() const;
 
     /**
      * @return  Кнопка подключения
@@ -88,7 +67,6 @@ public:
 
 signals:
     void serialPortChanged(const QSerialPortInfo &portInfo);
-    void baudRateChanged(qint32 baudRate);
     void connectionRequest();
     void disconnectionRequest();
 
@@ -96,13 +74,10 @@ private:
     void createUI();
     void connectSignals();
 
-    ViewMode m_viewMode{};
     ConnectionState m_state{};
 
     QLabel *m_serialPortLabel = nullptr;
     SerialPortSelector *m_serialPortSelector = nullptr;
-    QLabel *m_baudRateLabel = nullptr;
-    BaudRateSelector *m_baudRateSelector = nullptr;
 
     QLabel *m_connectionInfoLabel = nullptr;
 

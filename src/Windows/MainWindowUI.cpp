@@ -33,19 +33,6 @@ MainWindowUI::MainWindowUI(SectorTableModel &model, QMainWindow *window)
 }
 
 
-void MainWindowUI::setViewMode(ViewMode mode)
-{
-    m_connectionWidget->setViewMode(mode);
-
-    m_viewModeToggle->setText(toString(!mode));
-
-    m_sectorsSelectionWrapper->setCurrentIndex(mode == ViewMode::COMPACT ? 0 : 1);
-
-    m_dumpButton->setVisible(mode == ViewMode::EXTENDED);
-    m_clearButton->setVisible(mode == ViewMode::EXTENDED);
-}
-
-
 void MainWindowUI::setConnectionState(app::ConnectionState state)
 {
     m_connectionWidget->setConnectionState(state);
@@ -54,10 +41,9 @@ void MainWindowUI::setConnectionState(app::ConnectionState state)
 
 void MainWindowUI::setApplicationState(ApplicationState state)
 {
-    m_sectorsSelectionWrapper->setEnabled(state != ApplicationState::DISCONNECTED);
+    m_sectorPresets->setEnabled(state != ApplicationState::DISCONNECTED);
 
     m_dumpButton->setEnabled(state != ApplicationState::DISCONNECTED);
-    m_clearButton->setEnabled(state != ApplicationState::DISCONNECTED);
     m_verifyButton->setEnabled(state != ApplicationState::DISCONNECTED);
     m_writeButton->setEnabled(state != ApplicationState::DISCONNECTED);
 }
@@ -69,21 +55,9 @@ ConnectionWidget *MainWindowUI::getConnectionWidget() const
 }
 
 
-LinkButton *MainWindowUI::getViewModeToggle() const
-{
-    return m_viewModeToggle;
-}
-
-
 QPushButton *MainWindowUI::getDumpButton() const
 {
     return m_dumpButton;
-}
-
-
-QPushButton *MainWindowUI::getClearButton() const
-{
-    return m_clearButton;
 }
 
 
@@ -110,11 +84,6 @@ QWidget *MainWindowUI::createTopWorkspace(SectorTableModel &model)
     m_connectionWidget = new ConnectionWidget(m_window);
     layout->addWidget(m_connectionWidget);
 
-    // Sector selection
-    m_sectorsSelectionWrapper = new QStackedWidget(m_window);
-    m_sectorsSelectionWrapper->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(m_sectorsSelectionWrapper);
-
     // Compact mode
     auto *sectorPresetsContainer = new QWidget(m_window);
     auto *sectorPresetsLayout = new QVBoxLayout(sectorPresetsContainer);
@@ -123,16 +92,7 @@ QWidget *MainWindowUI::createTopWorkspace(SectorTableModel &model)
     sectorPresetsLayout->addWidget(m_sectorPresets);
     sectorPresetsLayout->addStretch();
 
-    m_sectorsSelectionWrapper->addWidget(sectorPresetsContainer);
-
-    // Extended mode
-    auto *sectorsTableContainer = new QWidget(m_window);
-    auto *sectorsTableLayout = new QVBoxLayout(sectorsTableContainer);
-
-    m_sectorTable = new SectorTableWidget(model, m_window);
-    sectorsTableLayout->addWidget(m_sectorTable);
-
-    m_sectorsSelectionWrapper->addWidget(sectorsTableContainer);
+    layout->addWidget(sectorPresetsContainer);
 
     //
     return container;
@@ -151,8 +111,6 @@ QWidget *MainWindowUI::createBottomWorkspace()
     auto *viewModeContainer = new QWidget(m_window);
     auto viewModeLayout = new QHBoxLayout(viewModeContainer);
 
-    m_viewModeToggle = new LinkButton(m_window);
-    viewModeLayout->addWidget(m_viewModeToggle);
     viewModeLayout->addStretch();
 
     layout->addWidget(viewModeContainer);
@@ -165,19 +123,19 @@ QWidget *MainWindowUI::createBottomWorkspace()
 
     // Action widgets group
     auto *actionsContainer = new QWidget(m_window);
-    auto *actionsLayout = new QGridLayout(actionsContainer);
+    auto *actionsLayout = new QVBoxLayout(actionsContainer);
 
     m_dumpButton = new QPushButton("Считать", m_window);
-    actionsLayout->addWidget(m_dumpButton, 0, 0);
-
-    m_clearButton = new QPushButton("Очистить", m_window);
-    actionsLayout->addWidget(m_clearButton, 0, 1);
+    m_dumpButton->setToolTip("Считать текущую прошивку в файлы");
+    actionsLayout->addWidget(m_dumpButton);
 
     m_verifyButton = new QPushButton("Проверить", m_window);
-    actionsLayout->addWidget(m_verifyButton, 1, 0);
+    m_verifyButton->setToolTip("Сравнить прошивку в секторах с выбранным файлом");
+    actionsLayout->addWidget(m_verifyButton);
 
     m_writeButton = new QPushButton("Записать", m_window);
-    actionsLayout->addWidget(m_writeButton, 1, 1);
+    m_writeButton->setToolTip("Записать файл прошивки в выбранные сектора");
+    actionsLayout->addWidget(m_writeButton);
 
     layout->addWidget(actionsContainer);
 
