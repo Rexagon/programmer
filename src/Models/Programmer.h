@@ -5,7 +5,7 @@
 #include <sitl/commands/Mrd.h>
 #include <sitl/commands/Mwr.h>
 
-#include "SectorTableModel.h"
+#include "SectorPresetsModel.h"
 
 namespace app
 {
@@ -105,7 +105,7 @@ public:
      * @brief           Очищает сектор, заполняя его "1"
      * @param sector    Сектор, который будет очищен
      */
-    void clearSector(const SectorTableModel::Sector &sector);
+    void clearSector(const SectorPresetsModel::Sector &sector);
 
     /**
      * @return  Описание подключённого программатора

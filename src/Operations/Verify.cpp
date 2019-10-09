@@ -33,7 +33,7 @@ std::optional<size_t> compare(const void *first, const void *second, const size_
 
 namespace app
 {
-Verify::Verify(Programmer &programmer, const SectorTableModel &model, const QString &fileName)
+Verify::Verify(Programmer &programmer, const SectorPresetsModel &model, const QString &fileName)
     : Operation{programmer, model, "Проверка"}
     , m_file{fileName}
 {
@@ -42,33 +42,16 @@ Verify::Verify(Programmer &programmer, const SectorTableModel &model, const QStr
 
 std::optional<QString> Verify::validate()
 {
-    const auto &selectedSectors = getSelectedSectors();
+    const auto &selectedPresets = getSelectedPresets();
 
-    if (selectedSectors.empty())
+    if (selectedPresets.empty())
     {
         return QString("Не выбрано ни одного сектора");
-    }
-
-    m_range = {selectedSectors.front().address, 0};
-    for (auto it = selectedSectors.begin(); it != selectedSectors.end(); ++it)
-    {
-        m_range.second += it->size;
-
-        auto nextIt = it + 1;
-        if (nextIt != selectedSectors.end() && it->number + 1 != nextIt->number)
-        {
-            return QString("Выбраны непоследовательные сектора");
-        }
     }
 
     if (!m_file.open(QIODevice::ReadOnly))
     {
         return QString("Невозможно открыть файл %1").arg(m_file.fileName());
-    }
-
-    if (m_range.second != m_file.size())
-    {
-        return QString("Размеры сравниваемого файла и выделенных секторов не совпадают");
     }
 
     return std::nullopt;
@@ -77,60 +60,114 @@ std::optional<QString> Verify::validate()
 
 void Verify::run()
 {
-    const size_t chunkSize = 1024;
-    std::vector<uint8_t> chunk{};
-
-    const auto &begin = m_range.first;
+    const auto &selectedPresets = getSelectedPresets();
+    std::vector<Differences> differences;
 
     // Чтение файла
     emit notifyProgress(0, 0, "Чтение файла");
-
     const auto data = m_file.readAll();
-    const auto dataSize = static_cast<size_t>(data.size());
 
-    // Проверка
-    for (auto address = begin; address < dataSize; address += chunkSize)
+    // Проверка групп секторов
+    for (const auto &item : selectedPresets)
     {
-        const auto current = address - begin;
-        const auto progressString = QString("Проверено байт: %L1 из %L2").arg(current).arg(dataSize);
+        const auto &preset = item.first;
 
-        getProgrammer().readData(chunk, address, chunkSize);
-
-        const auto mismatch = compare(data.data() + current, chunk.data(), chunkSize);
-        if (mismatch)
+        const auto result = verifyPreset(preset, data);
+        if (result)
         {
-            // Обнаружено несовпадение
-            emit notifyProgress(1, 1,
-                                QString("Данные в секторах не совпадают с данными в файле.\n"
-                                        "Адрес первого несовпадения: %1")
-                                    .arg(address + *mismatch, 5, 16));
-            emit notifyComplete();
-            return;
+            differences.emplace_back(*result);
         }
     }
 
     // Готово
-    emit notifyProgress(1, 1, "Данные в секторах совпадают с данными в файле");
+    if (differences.empty())
+    {
+        emit notifyProgress(1, 1, "Данные в секторах совпадают с данными в файле");
+    }
+    else
+    {
+        QString resultText;
+
+        for (const auto &item : differences)
+        {
+            QStringList sectorsText;
+            for (const auto &sectorIndex : item.second)
+            {
+                sectorsText.append(QString("SA%1").arg(item.first.sectors[sectorIndex].number));
+            }
+
+            resultText +=
+                QString("\t%1. Отличаются сектора:\n\t\t%2\n").arg(item.first.name).arg(sectorsText.join(", "));
+        }
+
+        emit notifyProgress(1, 1, QString("Найдены различия:\n%1").arg(resultText));
+    }
     emit notifyComplete();
 }
 
 
 QString Verify::getDescription() const
 {
-    const auto sectors = getSelectedSectors();
-    QString selectedSectorsString = "";
+    const auto &selectedPresets = getSelectedPresets();
 
-    for (const auto &sector : sectors)
+    QString presetsString;
+    for (const auto &item : selectedPresets)
     {
-        if (!selectedSectorsString.isEmpty())
-        {
-            selectedSectorsString += ", ";
-        }
-
-        selectedSectorsString += QString("SA%1").arg(sector.number);
+        const auto &preset = item.first;
+        presetsString += QString("\t%1\n").arg(preset.name);
     }
 
-    return QString("Сравнить файл:\n\t%1\nС данными в секторах:\n\t%2").arg(m_file.fileName(), selectedSectorsString);
+    return QString("Сравнить файл:\n\t%1\nС данными в секторах:\n%2").arg(m_file.fileName()).arg(presetsString);
+}
+
+
+std::optional<Verify::Differences> Verify::verifyPreset(const SectorPresetsModel::Preset &preset,
+                                                        const QByteArray &data)
+{
+    Differences differences{preset, {}};
+
+    const size_t chunkSize = 1024;
+    std::vector<uint8_t> chunk{};
+
+    const auto &sectors = preset.sectors;
+
+    size_t sectorsSize = 0;
+    for (const auto &sector : sectors)
+    {
+        sectorsSize += sector.size;
+    }
+
+    const auto dataSize = std::min(static_cast<size_t>(data.size()), sectorsSize);
+
+    const auto begin = sectors.front().address;
+    const auto end = begin + dataSize;
+
+    // Проверка
+    for (size_t i = 0; i < sectors.size(); ++i)
+    {
+        const auto &sector = sectors[i];
+
+        const auto sectorEnd = sector.address + sector.size;
+
+        for (auto address = sector.address; address < sectorEnd && address < end; address += chunkSize)
+        {
+            const auto globalCurrent = address - begin;
+            const auto localCurrent = address - sector.address;
+
+            const auto progressString =
+                QString("%1. Проверено байт: %L2 из %L3").arg(preset.name).arg(globalCurrent).arg(dataSize);
+
+            getProgrammer().readData(chunk, address, chunkSize);
+
+            const auto mismatch = compare(data.data() + localCurrent, chunk.data(), chunkSize);
+            if (mismatch)
+            {
+                differences.second.emplace_back(i);
+            }
+        }
+    }
+
+    return differences.second.empty() ? std::nullopt : std::optional{differences};
 }
 
 

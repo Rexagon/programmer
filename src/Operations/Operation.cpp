@@ -6,11 +6,11 @@
 
 namespace app
 {
-Operation::Operation(Programmer &programmer, const SectorTableModel &model, const QString &name)
+Operation::Operation(Programmer &programmer, const SectorPresetsModel &model, const QString &name)
     : m_name{name}
     , m_programmer{programmer}
-    , m_sectorTableModel{model}
-    , m_selectedSectors{model.getSelectedItems()}
+    , m_sectorPresetsModel{model}
+    , m_selectedPresets{model.getSelectedPresets()}
 {
 }
 
@@ -27,15 +27,14 @@ Programmer &Operation::getProgrammer() const
 }
 
 
-const SectorTableModel &Operation::getSectorTableModel() const
+const SectorPresetsModel &Operation::getSectorPresetsModel() const
 {
-    return m_sectorTableModel;
+    return m_sectorPresetsModel;
 }
 
-
-const std::vector<SectorTableModel::Sector> &Operation::getSelectedSectors() const
+const std::vector<std::pair<SectorPresetsModel::Preset, size_t>> &Operation::getSelectedPresets() const
 {
-    return m_selectedSectors;
+    return m_selectedPresets;
 }
 
 } // namespace app

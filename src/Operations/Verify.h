@@ -1,6 +1,8 @@
 #ifndef PROGRAMMER_SRC_OPERATIONS_VERIFY_H_
 #define PROGRAMMER_SRC_OPERATIONS_VERIFY_H_
 
+#include <optional>
+
 #include <QFile>
 
 #include "Operation.h"
@@ -14,13 +16,15 @@ class Verify final : public Operation
 {
     Q_OBJECT
 
+    using Differences = std::pair<const SectorPresetsModel::Preset&, std::vector<size_t>>;
+
 public:
     /**
      * @param programmer    Объект подключения к программатору
-     * @param model         Таблица секторов
+     * @param model         Пресеты секторов
      * @param fileName      Путь к файлу с прошивкой
      */
-    explicit Verify(Programmer &programmer, const SectorTableModel &model, const QString &fileName);
+    explicit Verify(Programmer &programmer, const SectorPresetsModel &model, const QString &fileName);
 
     /**
      * @brief   Проверяет, что выбран хотя бы один сектор,
@@ -45,8 +49,9 @@ public:
     QString getDescription() const override;
 
 private:
+    std::optional<Differences> verifyPreset(const SectorPresetsModel::Preset &preset, const QByteArray &data);
+
     QFile m_file;
-    std::pair<size_t, size_t> m_range = {0, 0};
 };
 
 } // namespace app

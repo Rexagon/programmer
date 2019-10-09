@@ -7,7 +7,7 @@
 
 #include "MainWindowUI.h"
 #include "Models/Programmer.h"
-#include "Models/SectorTableModel.h"
+#include "Models/SectorPresetsModel.h"
 #include "Operations/Operation.h"
 
 namespace app
@@ -42,7 +42,7 @@ private:
     void connectSignals();
     void syncState();
 
-    SectorTableModel m_sectorsTableModel{};
+    SectorPresetsModel m_sectorPresetsModel{};
     std::unique_ptr<Programmer> m_programmer{};
 
     MainWindowUI m_ui;

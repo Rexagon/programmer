@@ -7,7 +7,7 @@
 #include <QString>
 
 #include "Models/Programmer.h"
-#include "Models/SectorTableModel.h"
+#include "Models/SectorPresetsModel.h"
 
 namespace app
 {
@@ -24,7 +24,7 @@ public:
      * @param model         Таблица секторов
      * @param name          Название операции
      */
-    explicit Operation(Programmer &programmer, const SectorTableModel &model, const QString &name);
+    explicit Operation(Programmer &programmer, const SectorPresetsModel &model, const QString &name);
 
     /**
      * @brief   Проверяет возможность выполнения операции
@@ -68,17 +68,15 @@ signals:
 
 protected:
     Programmer &getProgrammer() const;
-    const SectorTableModel &getSectorTableModel() const;
-
-    const std::vector<SectorTableModel::Sector> &getSelectedSectors() const;
+    const SectorPresetsModel &getSectorPresetsModel() const;
+    const std::vector<std::pair<SectorPresetsModel::Preset, size_t>> &getSelectedPresets() const;
 
 private:
     QString m_name;
 
     Programmer &m_programmer;
-    const SectorTableModel &m_sectorTableModel;
-
-    std::vector<SectorTableModel::Sector> m_selectedSectors;
+    const SectorPresetsModel &m_sectorPresetsModel;
+    std::vector<std::pair<SectorPresetsModel::Preset, size_t>> m_selectedPresets;
 };
 
 } // namespace app

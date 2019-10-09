@@ -13,7 +13,6 @@
 #include "Operations/Dump.h"
 #include "Operations/Program.h"
 #include "Operations/Verify.h"
-#include <Operations/Clear.h>
 
 namespace
 {
@@ -27,7 +26,7 @@ namespace app
 {
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow{parent}
-    , m_ui{m_sectorsTableModel, this}
+    , m_ui{m_sectorPresetsModel, this}
     , m_connectionState{DEFAULT_CONNECTION_STATE}
     , m_applicationState{DEFAULT_APPLICATION_STATE}
 {
@@ -87,7 +86,7 @@ void MainWindow::disconnectProgrammer()
 void MainWindow::runDumpOperation()
 {
     selectFile([this](const QString &file) {
-        runOperation(std::make_unique<Dump>(*m_programmer, m_sectorsTableModel, file));
+        runOperation(std::make_unique<Dump>(*m_programmer, m_sectorPresetsModel, file));
     });
 }
 
@@ -95,7 +94,7 @@ void MainWindow::runDumpOperation()
 void MainWindow::runVerifyOperation()
 {
     selectFile([this](const QString &file) {
-        runOperation(std::make_unique<Verify>(*m_programmer, m_sectorsTableModel, file));
+        runOperation(std::make_unique<Verify>(*m_programmer, m_sectorPresetsModel, file));
     });
 }
 
@@ -103,7 +102,7 @@ void MainWindow::runVerifyOperation()
 void MainWindow::runWriteOperation()
 {
     selectFile([this](const QString &file) {
-        runOperation(std::make_unique<Program>(*m_programmer, m_sectorsTableModel, file));
+        runOperation(std::make_unique<Program>(*m_programmer, m_sectorPresetsModel, file));
     });
 }
 

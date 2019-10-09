@@ -16,7 +16,7 @@ constexpr auto WINDOW_WIDTH_MIN = 275;
 
 namespace app
 {
-MainWindowUI::MainWindowUI(SectorTableModel &model, QMainWindow *window)
+MainWindowUI::MainWindowUI(SectorPresetsModel &model, QMainWindow *window)
     : m_window{window}
 {
     m_window->setWindowTitle("Программатор");
@@ -41,7 +41,7 @@ void MainWindowUI::setConnectionState(app::ConnectionState state)
 
 void MainWindowUI::setApplicationState(ApplicationState state)
 {
-    m_sectorPresets->setEnabled(state != ApplicationState::DISCONNECTED);
+    m_sectorPresetsWidget->setEnabled(state != ApplicationState::DISCONNECTED);
 
     m_dumpButton->setEnabled(state != ApplicationState::DISCONNECTED);
     m_verifyButton->setEnabled(state != ApplicationState::DISCONNECTED);
@@ -73,7 +73,7 @@ QPushButton *MainWindowUI::getWriteButton() const
 }
 
 
-QWidget *MainWindowUI::createTopWorkspace(SectorTableModel &model)
+QWidget *MainWindowUI::createTopWorkspace(SectorPresetsModel &model)
 {
     auto *container = new QWidget(m_window);
     auto *layout = new QVBoxLayout(container);
@@ -88,8 +88,8 @@ QWidget *MainWindowUI::createTopWorkspace(SectorTableModel &model)
     auto *sectorPresetsContainer = new QWidget(m_window);
     auto *sectorPresetsLayout = new QVBoxLayout(sectorPresetsContainer);
 
-    m_sectorPresets = new SectorPresetsWidget(model, m_window);
-    sectorPresetsLayout->addWidget(m_sectorPresets);
+    m_sectorPresetsWidget = new SectorPresetsWidget(model, m_window);
+    sectorPresetsLayout->addWidget(m_sectorPresetsWidget);
     sectorPresetsLayout->addStretch();
 
     layout->addWidget(sectorPresetsContainer);

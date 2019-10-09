@@ -7,10 +7,9 @@
 #include <QStackedWidget>
 
 #include "General.h"
+#include "Models/SectorPresetsModel.h"
 #include "Widgets/ConnectionWidget.h"
-#include "Widgets/LinkButton.h"
 #include "Widgets/SectorPresetsWidget.h"
-#include "Widgets/SectorTableWidget.h"
 
 namespace app
 {
@@ -18,10 +17,10 @@ class MainWindowUI final
 {
 public:
     /**
-     * @param model     Таблица секторов
+     * @param model     Пресеты секторов
      * @param window    Родительское окно
      */
-    explicit MainWindowUI(SectorTableModel &model, QMainWindow *window);
+    explicit MainWindowUI(SectorPresetsModel &model, QMainWindow *window);
 
     /**
      * @brief       Устанавливает набор отображаемых элементов
@@ -66,14 +65,14 @@ public:
     MainWindowUI &operator=(MainWindowUI &&) noexcept = delete;
 
 private:
-    QWidget *createTopWorkspace(SectorTableModel &model);
+    QWidget *createTopWorkspace(SectorPresetsModel &model);
     QWidget *createBottomWorkspace();
 
     QMainWindow *m_window;
 
     ConnectionWidget *m_connectionWidget = nullptr;
 
-    SectorPresetsWidget *m_sectorPresets = nullptr;
+    SectorPresetsWidget *m_sectorPresetsWidget = nullptr;
 
     QPushButton *m_dumpButton = nullptr;
     QPushButton *m_verifyButton = nullptr;

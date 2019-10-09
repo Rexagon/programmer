@@ -6,7 +6,6 @@
 #include <QStackedWidget>
 #include <QWidget>
 
-#include "BaudRateSelector.h"
 #include "General.h"
 #include "SerialPortSelector.h"
 
