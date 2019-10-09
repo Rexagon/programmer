@@ -4,9 +4,7 @@
  */
 #include "SerialPortSelector.h"
 
-#include <QAbstractListModel>
-
-#include <QtSerialPort/QSerialPortInfo>
+#include "../Settings.h"
 
 namespace app
 {
@@ -17,11 +15,29 @@ SerialPortSelector::SerialPortSelector(QWidget *parent)
     setModel(&m_serialPortListModel);
     m_serialPortListModel.refresh();
 
-    if (!m_serialPortListModel.isEmpty())
+    if (m_serialPortListModel.isEmpty())
     {
-        // TODO: restore from last session
-        setCurrentIndex(0);
+        return;
     }
+
+    //
+    const auto &ports = m_serialPortListModel.getSerialPorts();
+    const auto portName = Settings::getInstance().loadSelectedSerialPort();
+
+    int index = 0;
+    for (int i = 0; i < ports.size(); ++i)
+    {
+        if (ports[i].portName() == portName)
+        {
+            index = i;
+            break;
+        }
+    }
+
+    setCurrentIndex(index);
+
+    //
+    connectSignals();
 }
 
 
@@ -30,6 +46,17 @@ void SerialPortSelector::showPopup()
     m_serialPortListModel.refresh();
 
     QComboBox::showPopup();
+}
+
+
+void SerialPortSelector::connectSignals()
+{
+    const auto OnChanged = static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged);
+
+    connect(this, OnChanged, [this](int index) {
+        const auto portInfo = itemData(index).value<QSerialPortInfo>();
+        Settings::getInstance().saveSelectedSerialPort(portInfo.portName());
+    });
 }
 
 } // namespace app

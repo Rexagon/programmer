@@ -24,6 +24,8 @@ protected:
     void showPopup() override;
 
 private:
+    void connectSignals();
+
     SerialPortListModel m_serialPortListModel;
 };
 

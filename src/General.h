@@ -1,6 +1,7 @@
 #ifndef PROGRAMMER_GENERAL_H
 #define PROGRAMMER_GENERAL_H
 
+#include <QSettings>
 #include <QString>
 
 namespace app

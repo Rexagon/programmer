@@ -31,6 +31,12 @@ int SerialPortListModel::rowCount(const QModelIndex & /*parent*/) const
 }
 
 
+const QList<QSerialPortInfo>& SerialPortListModel::getSerialPorts() const
+{
+    return m_serialPorts;
+}
+
+
 QVariant SerialPortListModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())

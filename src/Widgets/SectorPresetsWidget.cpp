@@ -9,6 +9,8 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
+#include "../Settings.h"
+
 namespace app
 {
 SectorPresetsWidget::SectorPresetsWidget(SectorPresetsModel &model, QWidget *parent)
@@ -35,20 +37,12 @@ void SectorPresetsWidget::createContent()
         checkBox->setTristate(false);
         layout->addWidget(checkBox);
 
+        checkBox->setChecked(Settings::getInstance().loadPresetState(i));
+
         connect(checkBox, &QCheckBox::stateChanged, [this, i](int state) {
-            switch (state)
-            {
-                case Qt::CheckState::Checked:
-                    m_model.setPresetSelected(i, true);
-                    break;
-
-                case Qt::CheckState::Unchecked:
-                    m_model.setPresetSelected(i, false);
-                    break;
-
-                default:
-                    break;
-            }
+            const auto checked = state == Qt::CheckState::Checked;
+            m_model.setPresetSelected(i, checked);
+            Settings::getInstance().savePresetState(i, checked);
         });
     }
 }

@@ -30,6 +30,11 @@ public:
     void refresh();
 
     /**
+     * @return  Список со всеми портами
+     */
+    const QList<QSerialPortInfo> &getSerialPorts() const;
+
+    /**
      * @return  true, если список пуст
      */
     bool isEmpty() const;

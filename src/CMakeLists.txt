@@ -16,6 +16,8 @@ set(PROGRAMMER_SRC
     Windows/MainWindowUI.cpp
     Windows/OperationDialog.cpp
 
+    Settings.cpp
+
     main.cpp
 )
 
