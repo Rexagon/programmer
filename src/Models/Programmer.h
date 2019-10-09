@@ -14,8 +14,6 @@ namespace app
  */
 class Programmer final
 {
-    using Timings = std::tuple<uint8_t, uint8_t, uint8_t>;
-
 public:
     enum Address : uint32_t
     {
@@ -27,8 +25,6 @@ public:
         BIVK_DATA_BEGIN = 0x00040000u,
         BIVK_DATA_END = 0x0007FFFFu
     };
-
-    
 
     /**
      * @brief           Создаёт подключение к программатору
@@ -122,9 +118,59 @@ public:
     uint64_t getVersion() const;
 
 private:
+    enum class ReadHoldTiming : uint8_t
+    {
+        T2 = 0b00u,
+        T3 = 0b10u,
+        T4 = 0b11u
+    };
+
+    enum class ReadActiveTiming : uint8_t
+    {
+        T4 = 0b00u,
+        T5 = 0b01u,
+        T6 = 0b10u,
+        T7 = 0b11u
+    };
+
+    enum class ReadSetupTiming : uint8_t
+    {
+        T1 = 0b00u,
+        T2 = 0b01u,
+        T3 = 0b10u,
+        T4 = 0b11u
+    };
+
+    enum class WriteHoldTiming : uint8_t
+    {
+        T1 = 0b00u,
+        T2 = 0b01u,
+        T3 = 0b10u,
+        T4 = 0b11u
+    };
+
+    enum class WriteActiveTiming : uint8_t
+    {
+        T3 = 0b00u,
+        T4 = 0b01u,
+        T5 = 0b10u,
+        T6 = 0b11u
+    };
+
+    enum class WriteSetupTiming : uint8_t
+    {
+        T1 = 0b00u,
+        T2 = 0b01u,
+        T3 = 0b10u,
+        T4 = 0b11u
+    };
+
+    using ReadingTimings = std::tuple<ReadSetupTiming, ReadActiveTiming, ReadHoldTiming>;
+    using WritingTimings = std::tuple<WriteSetupTiming, WriteActiveTiming, WriteHoldTiming>;
+
     void setBuffersEnabled(bool enabled);
-    void setWritingTimings(uint8_t setup, uint8_t active, uint8_t hold);
-    void setReadingTimings(uint8_t setup, uint8_t active, uint8_t hold);
+    void setWritingTimings(WriteSetupTiming setup, WriteActiveTiming active, WriteHoldTiming hold);
+    void setReadingTimings(ReadSetupTiming setup, ReadActiveTiming active, ReadHoldTiming hold);
 
     void applyConfiguration();
 
@@ -142,8 +188,8 @@ private:
     std::string m_description{};
     uint64_t m_version = 0u;
 
-    Timings m_writingTimings{};
-    Timings m_readingTimings{};
+    WritingTimings m_writingTimings{};
+    ReadingTimings m_readingTimings{};
     bool m_areBuffersEnabled = false;
 
     uint16_t m_serviceReg = 0x0000u;

@@ -5,8 +5,8 @@
 #include "Programmer.h"
 
 #include <cassert>
+#include <iostream>
 
-#include <sitl/commands/Iden.h>
 #include <sitl/commands/Mrd.h>
 #include <sitl/commands/Mwr.h>
 
@@ -17,6 +17,7 @@ namespace
 void setBits(uint16_t &target, uint16_t value, uint16_t valueMask, uint16_t offset)
 {
     const auto mask = static_cast<uint16_t>(~static_cast<uint16_t>(valueMask << offset));
+
     target &= mask;
     target |= static_cast<uint16_t>(static_cast<uint16_t>(value & valueMask) << offset);
 }
@@ -29,36 +30,6 @@ constexpr uint16_t BUS_OE = 2u;    // Включение буфферов
 constexpr uint16_t RESET = 3u;     // Сигнал сброса программатора
 
 } // namespace sr
-
-namespace timings
-{
-struct Range
-{
-    bool check(const uint8_t value) const
-    {
-        return value >= min && value <= max;
-    }
-
-    void write(uint16_t &target, const uint8_t value) const
-    {
-        assert(check(value));
-        setBits(target, static_cast<uint16_t>(value + 4u - static_cast<uint16_t>(max - min)), 0x0003u, offset);
-    }
-
-    uint16_t offset;
-
-    uint16_t min;
-    uint16_t max;
-};
-
-constexpr auto WRITE_SETUP = Range{4u /* offset */, 1u /* min */, 4u /* max */};
-constexpr auto WRITE_ACTIVE = Range{6u /* offset */, 3u /* min */, 6u /* max */};
-constexpr auto WRITE_HOLD = Range{8u /* offset */, 1u /* min */, 4u /* max */};
-
-constexpr auto READ_SETUP = Range{10u /* offset */, 1u /* min */, 4u /* max */};
-constexpr auto READ_ACTIVE = Range{12u /* offset */, 4u /* min */, 7u /* max */};
-constexpr auto READ_HOLD = Range{14u /* offset */, 2u /* min */, 4u /* max */};
-} // namespace timings
 } // namespace
 
 
@@ -93,15 +64,11 @@ void Programmer::reset()
     setBuffersEnabled(true);
 
     // Устанавливаем тайминги
-    /*
-    setWritingTimings(4, 6, 4);
-    setReadingTimings(4, 7, 4);
+    setWritingTimings(WriteSetupTiming::T1, WriteActiveTiming::T3, WriteHoldTiming::T1);
+    setReadingTimings(ReadSetupTiming::T1, ReadActiveTiming::T7, ReadHoldTiming::T2);
 
     // Применяем конфигурацию
     applyConfiguration();
-     */
-
-    setServiceReg(0x3005u, true);
 
     // Обнуляем адресный регистр
     setAddressReg(0x0000u, true);
@@ -110,7 +77,7 @@ void Programmer::reset()
     disableProgramming();
 
     // На всякий случай выполняем команду Reset для flash
-    writeData(0x00000u, 0xF0u);
+    writeData(0x00000u, 0xF0F0F0F0u);
 }
 
 
@@ -133,7 +100,7 @@ void Programmer::readData(std::vector<uint8_t> &data, const size_t begin, const 
     {
         using ReadType = uint64_t;
 
-        const auto result = readData < ReadType > (address);
+        const auto result = readData<ReadType>(address);
 
         for (size_t i = 0; i < sizeof(ReadType); ++i)
         {
@@ -215,41 +182,33 @@ void Programmer::setBuffersEnabled(bool enabled)
 }
 
 
-void Programmer::setWritingTimings(const uint8_t setup, const uint8_t active, const uint8_t hold)
+void Programmer::setWritingTimings(WriteSetupTiming setup, WriteActiveTiming active, WriteHoldTiming hold)
 {
-    using namespace timings;
-
-    assert(WRITE_SETUP.check(setup) && WRITE_ACTIVE.check(active) && WRITE_HOLD.check(hold));
     m_writingTimings = {setup, active, hold};
 }
 
 
-void Programmer::setReadingTimings(const uint8_t setup, const uint8_t active, const uint8_t hold)
+void Programmer::setReadingTimings(ReadSetupTiming setup, ReadActiveTiming active, ReadHoldTiming hold)
 {
-    using namespace timings;
-
-    assert(READ_SETUP.check(setup) && READ_ACTIVE.check(active) && READ_HOLD.check(hold));
     m_readingTimings = {setup, active, hold};
 }
 
 
 void Programmer::applyConfiguration()
 {
-    using namespace timings;
-
     uint16_t configuration = 0x0000u;
 
-    setBits(m_serviceReg, true, 0x0001u, sr::EXT_RES_O); // Всегда включаем режим сброса на бивке
+    setBits(configuration, true, 0b1u, sr::EXT_RES_O); // Всегда включаем режим сброса на бивке
 
-    setBits(configuration, m_areBuffersEnabled, 0x0001u, sr::BUS_OE);
+    setBits(configuration, m_areBuffersEnabled, 0b1u, sr::BUS_OE);
 
-    WRITE_SETUP.write(configuration, std::get<0>(m_writingTimings));
-    WRITE_ACTIVE.write(configuration, std::get<1>(m_writingTimings));
-    WRITE_HOLD.write(configuration, std::get<2>(m_writingTimings));
+    setBits(configuration, static_cast<uint16_t>(std::get<WriteSetupTiming>(m_writingTimings)), 0b11u, 4u);
+    setBits(configuration, static_cast<uint16_t>(std::get<WriteActiveTiming>(m_writingTimings)), 0b11u, 6u);
+    setBits(configuration, static_cast<uint16_t>(std::get<WriteHoldTiming>(m_writingTimings)), 0b11u, 8u);
 
-    READ_SETUP.write(configuration, std::get<0>(m_readingTimings));
-    READ_ACTIVE.write(configuration, std::get<1>(m_readingTimings));
-    READ_HOLD.write(configuration, std::get<2>(m_readingTimings));
+    setBits(configuration, static_cast<uint16_t>(std::get<ReadSetupTiming>(m_readingTimings)), 0b11u, 10u);
+    setBits(configuration, static_cast<uint16_t>(std::get<ReadActiveTiming>(m_readingTimings)), 0b11u, 12u);
+    setBits(configuration, static_cast<uint16_t>(std::get<ReadHoldTiming>(m_readingTimings)), 0b11u, 14u);
 
     setServiceReg(configuration);
 }
