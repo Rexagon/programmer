@@ -153,7 +153,7 @@ void Programmer::disableProgramming()
 }
 
 
-void Programmer::clearSector(const app::SectorTableModel::Sector &sector)
+void Programmer::clearSector(const SectorPresetsModel::Sector &sector)
 {
     writeData(0x00AAAu << 2u, 0xAAAAAAAAu);
     writeData(0x00555u << 2u, 0x55555555u);

@@ -7,10 +7,9 @@
 #include <QStackedWidget>
 
 #include "General.h"
+#include "Models/SectorPresetsModel.h"
 #include "Widgets/ConnectionWidget.h"
-#include "Widgets/LinkButton.h"
 #include "Widgets/SectorPresetsWidget.h"
-#include "Widgets/SectorTableWidget.h"
 
 namespace app
 {
@@ -18,18 +17,10 @@ class MainWindowUI final
 {
 public:
     /**
-     * @param model     Таблица секторов
+     * @param model     Пресеты секторов
      * @param window    Родительское окно
      */
-    explicit MainWindowUI(SectorTableModel &model, QMainWindow *window);
-
-    /**
-     * @brief       Устанавливает набор отображаемых элементов
-     *              в зависимости от режима отображения
-     *
-     * @param mode  Режим отображения
-     */
-    void setViewMode(ViewMode mode);
+    explicit MainWindowUI(SectorPresetsModel &model, QMainWindow *window);
 
     /**
      * @brief       Устанавливает набор отображаемых элементов
@@ -53,19 +44,9 @@ public:
     ConnectionWidget *getConnectionWidget() const;
 
     /**
-     * @return  Кнопка переключения режимов отображения
-     */
-    LinkButton *getViewModeToggle() const;
-
-    /**
      * @return  Кнопка операции считывания
      */
     QPushButton *getDumpButton() const;
-
-    /**
-     * @return  Кнопка операции очистки
-     */
-    QPushButton *getClearButton() const;
 
     /**
      * @return  Кнопка операции проверки
@@ -84,22 +65,16 @@ public:
     MainWindowUI &operator=(MainWindowUI &&) noexcept = delete;
 
 private:
-    QWidget *createTopWorkspace(SectorTableModel &model);
+    QWidget *createTopWorkspace(SectorPresetsModel &model);
     QWidget *createBottomWorkspace();
 
     QMainWindow *m_window;
 
     ConnectionWidget *m_connectionWidget = nullptr;
 
-    QStackedWidget *m_sectorsSelectionWrapper = nullptr;
-    SectorPresetsWidget *m_sectorPresets = nullptr;
-    SectorTableWidget *m_sectorTable = nullptr;
-
-    LinkButton *m_viewModeToggle = nullptr;
+    SectorPresetsWidget *m_sectorPresetsWidget = nullptr;
 
     QPushButton *m_dumpButton = nullptr;
-    QPushButton *m_clearButton = nullptr;
-
     QPushButton *m_verifyButton = nullptr;
     QPushButton *m_writeButton = nullptr;
 };

@@ -13,11 +13,9 @@
 #include "Operations/Dump.h"
 #include "Operations/Program.h"
 #include "Operations/Verify.h"
-#include <Operations/Clear.h>
 
 namespace
 {
-constexpr auto DEFAULT_VIEW_MODE = app::ViewMode::COMPACT;
 constexpr auto DEFAULT_CONNECTION_STATE = app::ConnectionState::DISCONNECTED;
 constexpr auto DEFAULT_APPLICATION_STATE = app::ApplicationState::DISCONNECTED;
 
@@ -28,8 +26,7 @@ namespace app
 {
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow{parent}
-    , m_ui{m_sectorsTableModel, this}
-    , m_viewMode{DEFAULT_VIEW_MODE}
+    , m_ui{m_sectorPresetsModel, this}
     , m_connectionState{DEFAULT_CONNECTION_STATE}
     , m_applicationState{DEFAULT_APPLICATION_STATE}
 {
@@ -54,7 +51,7 @@ void MainWindow::connectProgrammer()
         const auto connectionWidget = m_ui.getConnectionWidget();
 
         const auto selectedPort = connectionWidget->getSelectedSerialPort();
-        const auto selectedBaudRate = connectionWidget->getSelectedBaudRate();
+        const auto selectedBaudRate = 115200;
 
         m_programmer = std::make_unique<Programmer>(selectedPort.portName().toStdString(), selectedBaudRate);
 
@@ -86,10 +83,18 @@ void MainWindow::disconnectProgrammer()
 }
 
 
+void MainWindow::runDumpOperation()
+{
+    selectFile([this](const QString &file) {
+        runOperation(std::make_unique<Dump>(*m_programmer, m_sectorPresetsModel, file));
+    });
+}
+
+
 void MainWindow::runVerifyOperation()
 {
     selectFile([this](const QString &file) {
-        runOperation(std::make_unique<Verify>(*m_programmer, m_sectorsTableModel, file));
+        runOperation(std::make_unique<Verify>(*m_programmer, m_sectorPresetsModel, file));
     });
 }
 
@@ -97,29 +102,8 @@ void MainWindow::runVerifyOperation()
 void MainWindow::runWriteOperation()
 {
     selectFile([this](const QString &file) {
-        runOperation(std::make_unique<Program>(*m_programmer, m_sectorsTableModel, file));
+        runOperation(std::make_unique<Program>(*m_programmer, m_sectorPresetsModel, file));
     });
-}
-
-
-void MainWindow::runDumpOperation()
-{
-    selectFile([this](const QString &file) {
-        runOperation(std::make_unique<Dump>(*m_programmer, m_sectorsTableModel, file));
-    });
-}
-
-
-void MainWindow::runClearOperation()
-{
-    runOperation(std::make_unique<Clear>(*m_programmer, m_sectorsTableModel));
-}
-
-
-void MainWindow::toggleViewMode()
-{
-    m_viewMode = !m_viewMode;
-    m_ui.setViewMode(m_viewMode);
 }
 
 
@@ -166,18 +150,14 @@ void MainWindow::connectSignals()
     connect(connectionWidget, &ConnectionWidget::connectionRequest, this, &MainWindow::connectProgrammer);
     connect(connectionWidget, &ConnectionWidget::disconnectionRequest, this, &MainWindow::disconnectProgrammer);
 
-    connect(m_ui.getViewModeToggle(), &LinkButton::clicked, this, &MainWindow::toggleViewMode);
-
-    connect(m_ui.getWriteButton(), &QPushButton::clicked, this, &MainWindow::runWriteOperation);
-    connect(m_ui.getVerifyButton(), &QPushButton::clicked, this, &MainWindow::runVerifyOperation);
     connect(m_ui.getDumpButton(), &QPushButton::clicked, this, &MainWindow::runDumpOperation);
-    connect(m_ui.getClearButton(), &QPushButton::clicked, this, &MainWindow::runClearOperation);
+    connect(m_ui.getVerifyButton(), &QPushButton::clicked, this, &MainWindow::runVerifyOperation);
+    connect(m_ui.getWriteButton(), &QPushButton::clicked, this, &MainWindow::runWriteOperation);
 }
 
 
 void MainWindow::syncState()
 {
-    m_ui.setViewMode(m_viewMode);
     m_ui.setConnectionState(m_connectionState);
     m_ui.setApplicationState(m_applicationState);
 }

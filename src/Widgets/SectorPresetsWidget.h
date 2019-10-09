@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#include "Models/SectorTableModel.h"
+#include "Models/SectorPresetsModel.h"
 
 namespace app
 {
@@ -17,18 +17,12 @@ class SectorPresetsWidget : public QWidget
 {
     Q_OBJECT
 
-    struct Preset
-    {
-        QCheckBox *checkBox;
-        std::vector<int> sectors;
-    };
-
 public:
     /**
      * @param model     Таблица секторов
      * @param parent    Родительский виджет
      */
-    explicit SectorPresetsWidget(SectorTableModel &model, QWidget *parent);
+    explicit SectorPresetsWidget(SectorPresetsModel &model, QWidget *parent);
 
 public:
     SectorPresetsWidget(const SectorPresetsWidget &) = delete;
@@ -37,10 +31,9 @@ public:
     SectorPresetsWidget &operator=(SectorPresetsWidget &&) noexcept = delete;
 
 private:
-    void createUI();
-    void setModel(SectorTableModel &model);
+    void createContent();
 
-    std::vector<Preset> m_presets{};
+    SectorPresetsModel &m_model;
 };
 
 } // namespace app

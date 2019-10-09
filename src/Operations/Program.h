@@ -1,7 +1,6 @@
 #ifndef PROGRAMMER_SRC_OPERATIONS_PROGRAM_H_
 #define PROGRAMMER_SRC_OPERATIONS_PROGRAM_H_
 
-#include "Models/SectorTableModel.h"
 #include "Operation.h"
 
 #include <QFile>
@@ -18,10 +17,10 @@ class Program final : public Operation
 public:
     /**
      * @param programmer    Объект подключения к программатору
-     * @param model         Таблица секотров
+     * @param model         Пресеты секторов
      * @param fileName      Путь к файлу с прошивкой
      */
-    explicit Program(Programmer &programmer, const SectorTableModel &model, const QString &fileName);
+    explicit Program(Programmer &programmer, const SectorPresetsModel &model, const QString &fileName);
 
     /**
      * @brief   Проверяет, что выбран хотя бы один сектор,
@@ -44,8 +43,9 @@ public:
     QString getDescription() const override;
 
 private:
+    void programPreset(const SectorPresetsModel::Preset &preset, const QByteArray &data);
+
     QFile m_file;
-    std::pair<size_t, size_t> m_range = {0, 0};
 };
 
 } // namespace app

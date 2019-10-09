@@ -15,10 +15,10 @@ class Dump : public Operation
 public:
     /**
      * @param programmer    Объект подключения к программатору
-     * @param model         Таблица секторов
+     * @param model         Пресеты секторов
      * @param fileName      Путь к файлу, в который будет записан результат
      */
-    explicit Dump(Programmer &programmer, const SectorTableModel &model, const QString &fileName);
+    explicit Dump(Programmer &programmer, const SectorPresetsModel &model, const QString &fileName);
 
     /**
      * @brief   Проверяет, что выбран хотя бы один сектор
@@ -41,7 +41,10 @@ public:
     QString getDescription() const override;
 
 private:
-    QFile m_file;
+    void dumpPreset(const SectorPresetsModel::Preset &preset, size_t index);
+
+    QString m_fileName;
+    std::vector<std::unique_ptr<QFile>> m_files;
 };
 
 } // namespace app

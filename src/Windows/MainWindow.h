@@ -7,7 +7,7 @@
 
 #include "MainWindowUI.h"
 #include "Models/Programmer.h"
-#include "Models/SectorTableModel.h"
+#include "Models/SectorPresetsModel.h"
 #include "Operations/Operation.h"
 
 namespace app
@@ -30,12 +30,9 @@ private:
     void connectProgrammer();
     void disconnectProgrammer();
 
+    void runDumpOperation();
     void runVerifyOperation();
     void runWriteOperation();
-    void runDumpOperation();
-    void runClearOperation();
-
-    void toggleViewMode();
 
     void runOperation(std::unique_ptr<Operation> operation);
 
@@ -45,12 +42,11 @@ private:
     void connectSignals();
     void syncState();
 
-    SectorTableModel m_sectorsTableModel{};
+    SectorPresetsModel m_sectorPresetsModel{};
     std::unique_ptr<Programmer> m_programmer{};
 
     MainWindowUI m_ui;
 
-    ViewMode m_viewMode;
     ConnectionState m_connectionState;
     ApplicationState m_applicationState;
 
