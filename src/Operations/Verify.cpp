@@ -151,18 +151,19 @@ std::optional<Verify::Differences> Verify::verifyPreset(const SectorPresetsModel
 
         for (auto address = sector.address; address < sectorEnd && address < end; address += chunkSize)
         {
-            const auto globalCurrent = address - begin;
-            const auto localCurrent = address - sector.address;
-
+            const auto current = address - begin;
             const auto progressString =
-                QString("%1. Проверено байт: %L2 из %L3").arg(preset.name).arg(globalCurrent).arg(dataSize);
+                QString("%1\nПроверено байт: %L2 из %L3").arg(preset.name).arg(current).arg(dataSize);
+
+            emit notifyProgress(static_cast<int>(dataSize), static_cast<int>(current), progressString);
 
             getProgrammer().readData(chunk, address, chunkSize);
 
-            const auto mismatch = compare(data.data() + localCurrent, chunk.data(), chunkSize);
+            const auto mismatch = compare(data.data() + current, chunk.data(), chunkSize);
             if (mismatch)
             {
                 differences.second.emplace_back(i);
+                break;
             }
         }
     }

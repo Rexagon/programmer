@@ -49,7 +49,7 @@ void Program::run()
         for (size_t i = 0; i < sectors.size(); ++i)
         {
             emit notifyProgress(static_cast<int>(sectors.size()), static_cast<int>(i),
-                                QString("%1. Очищено секторов: %2 из %3").arg(preset.name).arg(i).arg(sectors.size()));
+                                QString("%1\nОчищено секторов: %2 из %3").arg(preset.name).arg(i).arg(sectors.size()));
 
             getProgrammer().clearSector(sectors[i]);
         }
@@ -122,7 +122,7 @@ void Program::programPreset(const app::SectorPresetsModel::Preset &preset, const
     {
         const auto current = address - begin;
         const auto progressString =
-            QString("%1. Записано байт: %L1 из %L2").arg(preset.name).arg(current).arg(dataSize);
+            QString("%1\nЗаписано байт: %L2 из %L3").arg(preset.name).arg(current).arg(dataSize);
 
         emit notifyProgress(static_cast<int>(dataSize), static_cast<int>(current), progressString);
 

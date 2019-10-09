@@ -42,7 +42,7 @@ namespace app
 SectorPresetsModel::SectorPresetsModel()
     : m_presets{
           Preset{QString{"Копия 1 (Сектора SA0, SA1, SA2, SA3)"},
-                 {SECTORS[0], SECTORS[1], SECTORS[2], SECTORS[3], SECTORS[4]},
+                 {SECTORS[0], SECTORS[1], SECTORS[2], SECTORS[3]},
                  false},
           Preset{QString{"Копия 2 (Сектор SA11)"}, {SECTORS[11]}, false},
       }

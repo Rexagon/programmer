@@ -26,7 +26,7 @@ std::optional<QString> Dump::validate()
     }
 
     const auto extensionIndex = m_fileName.lastIndexOf(".");
-    const auto base = extensionIndex < 0 ? m_fileName : m_fileName.left(extensionIndex - 1);
+    const auto base = extensionIndex < 0 ? m_fileName : m_fileName.left(extensionIndex);
     const auto extension = extensionIndex < 0 ? QString{} : m_fileName.mid(extensionIndex + 1);
 
     for (const auto &item : selectedPresets)
@@ -69,7 +69,7 @@ QString Dump::getDescription() const
     QString presetsString;
     for (const auto &[preset, index] : selectedPresets)
     {
-        presetsString += QString("\t%1 в %2\n").arg(preset.name).arg(m_files[index]->fileName());
+        presetsString += QString("\t%1\n\t\tв %2\n").arg(preset.name).arg(m_files[index]->fileName());
     }
 
     return QString("Считывание:\n%1").arg(presetsString);
@@ -80,30 +80,31 @@ void Dump::dumpPreset(const SectorPresetsModel::Preset &preset, size_t index)
 {
     const auto chunkSize = 1024;
 
-    std::list<std::vector<uint8_t>> chunks;
-
     // Считаем сколько надо всего прочитать
-    size_t total = 0;
-    for (const auto &sector : preset.sectors)
+    const auto &sectors = preset.sectors;
+
+    size_t dataSize = 0;
+    for (const auto &sector : sectors)
     {
-        total += sector.size;
+        dataSize += sector.size;
     }
 
+    const auto begin = sectors.front().address;
+    const auto end = begin + dataSize;
+
+    std::list<std::vector<uint8_t>> chunks;
+
     // Считываем память
-    size_t current = 0;
-    for (const auto &sector : preset.sectors)
+    for (auto address = begin; address < end; address += chunkSize)
     {
-        for (auto address = sector.address; address < sector.address + sector.size; address += chunkSize)
-        {
-            const auto progressString =
-                QString("%1. Скопировано байт: %L2 из %L3").arg(preset.name).arg(current).arg(total);
+        const auto current = address - begin;
+        const auto progressString =
+            QString("%1\nСкопировано байт: %L2 из %L3").arg(preset.name).arg(current).arg(dataSize);
 
-            emit notifyProgress(static_cast<int>(total), static_cast<int>(current), progressString);
+        emit notifyProgress(static_cast<int>(dataSize), static_cast<int>(current), progressString);
 
-            chunks.emplace_back();
-            getProgrammer().readData(chunks.back(), address, chunkSize);
-            current += chunkSize;
-        }
+        chunks.emplace_back();
+        getProgrammer().readData(chunks.back(), address, chunkSize);
     }
 
     // Запись в файл
@@ -113,7 +114,7 @@ void Dump::dumpPreset(const SectorPresetsModel::Preset &preset, size_t index)
     for (const auto &chunk : chunks)
     {
         const auto progressString =
-            QString("%1. Запись в файл: %2 / %3").arg(preset.name).arg(currentChunk + 1).arg(chunks.size());
+            QString("%1\nЗапись в файл: %2 / %3").arg(preset.name).arg(currentChunk + 1).arg(chunks.size());
 
         emit notifyProgress(static_cast<int>(chunks.size()), currentChunk, progressString);
         ++currentChunk;

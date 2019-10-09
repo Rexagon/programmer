@@ -43,7 +43,7 @@ void SectorPresetsWidget::createContent()
                     break;
 
                 case Qt::CheckState::Unchecked:
-                    m_model.setPresetSelected(i, true);
+                    m_model.setPresetSelected(i, false);
                     break;
 
                 default:
