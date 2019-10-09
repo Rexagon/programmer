@@ -20,6 +20,7 @@ build_develop:
   only:
     - develop
   script:
+    - export APP_VERSION=$CI_COMMIT_SHORT_SHA
     - sh build.sh --without-deployment
     - cp -r ~/qtdist/* build/
     - cp 3rdparty/sitl/dist/bin/*.dll build/

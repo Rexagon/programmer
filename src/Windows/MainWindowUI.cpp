@@ -9,6 +9,8 @@
 #include <QLabel>
 #include <QPushButton>
 
+#include "../General.h"
+
 namespace
 {
 constexpr auto WINDOW_WIDTH_MIN = 275;
@@ -20,7 +22,7 @@ MainWindowUI::MainWindowUI(SectorPresetsModel &model, QMainWindow *window)
     : m_window{window}
 {
     m_window->setWindowTitle("Программатор");
-    m_window->setMinimumWidth(WINDOW_WIDTH_MIN);
+    m_window->setFixedWidth(WINDOW_WIDTH_MIN);
 
     auto *container = new QWidget(m_window);
     auto *layout = new QVBoxLayout(container);
@@ -90,9 +92,22 @@ QWidget *MainWindowUI::createTopWorkspace(SectorPresetsModel &model)
 
     m_sectorPresetsWidget = new SectorPresetsWidget(model, m_window);
     sectorPresetsLayout->addWidget(m_sectorPresetsWidget);
-    sectorPresetsLayout->addStretch();
 
     layout->addWidget(sectorPresetsContainer);
+
+    //
+    layout->addStretch();
+
+    //
+    auto *versionLabelContainer = new QWidget(m_window);
+    auto *versionLabelLayout = new QHBoxLayout(versionLabelContainer);
+
+    versionLabelLayout->addStretch();
+
+    auto *versionLabel = new QLabel(QString("Версия: %1").arg(APP_VERSION), m_window);
+    versionLabelLayout->addWidget(versionLabel);
+
+    layout->addWidget(versionLabelContainer);
 
     //
     return container;
@@ -106,14 +121,6 @@ QWidget *MainWindowUI::createBottomWorkspace()
 
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
-
-    // View mode toggle
-    auto *viewModeContainer = new QWidget(m_window);
-    auto viewModeLayout = new QHBoxLayout(viewModeContainer);
-
-    viewModeLayout->addStretch();
-
-    layout->addWidget(viewModeContainer);
 
     // Separator
     auto *separator = new QFrame;

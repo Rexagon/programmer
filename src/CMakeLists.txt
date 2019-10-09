@@ -77,6 +77,9 @@ set_target_properties(programmer
     RUNTIME_OUTPUT_DIRECTORY ${BUILD_OUTPUT_DIR}
 )
 
+target_compile_definitions(programmer
+    PRIVATE APP_VERSION="$ENV{APP_VERSION}")
+
 # deployment
 
 set(WINDEPLOYQT_EXE $ENV{Qt5_DIR}/../../../bin/windeployqt.exe)

@@ -4,6 +4,10 @@
 #include <QSettings>
 #include <QString>
 
+#ifndef APP_VERSION
+#define APP_VERSION "DEV"
+#endif
+
 namespace app
 {
 enum class ConnectionState

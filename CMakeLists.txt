@@ -3,6 +3,12 @@ project(programmer)
 
 option(WIN_DEPLOY "Find and deploy all dlls for windows (works only on windows)" ON)
 
+if (NOT DEFINED ENV{APP_VERSION})
+    set(ENV{APP_VERSION} "DEV")
+endif()
+
+message("Building programmer version: ${APP_VERSION}")
+
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(SYSTEM_BIT_POSTFIX x64)
 elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
