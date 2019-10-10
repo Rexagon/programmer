@@ -7,6 +7,8 @@
 
 #include <array>
 
+#include "../Settings.h"
+
 namespace
 {
 using Sector = app::SectorPresetsModel::Sector;
@@ -43,8 +45,8 @@ SectorPresetsModel::SectorPresetsModel()
     : m_presets{
           Preset{QString{"Копия 1 (Сектора SA0, SA1, SA2, SA3)"},
                  {SECTORS[0], SECTORS[1], SECTORS[2], SECTORS[3]},
-                 false},
-          Preset{QString{"Копия 2 (Сектор SA11)"}, {SECTORS[11]}, false},
+                 Settings::getInstance().loadPresetState(0)},
+          Preset{QString{"Копия 2 (Сектор SA11)"}, {SECTORS[11]}, Settings::getInstance().loadPresetState(1)},
       }
 {
 }
@@ -55,6 +57,7 @@ void SectorPresetsModel::setPresetSelected(size_t index, bool selected)
     assert(index < m_presets.size());
 
     m_presets[index].selected = selected;
+    Settings::getInstance().savePresetState(index, selected);
 }
 
 

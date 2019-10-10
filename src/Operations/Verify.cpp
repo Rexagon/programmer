@@ -162,7 +162,6 @@ std::optional<Verify::Differences> Verify::verifyPreset(const SectorPresetsModel
             const auto mismatch = compare(data.data() + current, chunk.data(), chunkSize);
             if (mismatch)
             {
-                printf("%u\n", *mismatch);
                 differences.second.emplace_back(i);
                 break;
             }

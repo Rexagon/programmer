@@ -97,6 +97,7 @@ void Programmer::readData(std::vector<uint8_t> &data, const size_t begin, const 
         throw std::logic_error{"Невозможно считать блок данных"};
     }
 
+    data.clear();
     data.reserve(size);
     for (size_t address = begin; address < begin + size;)
     {

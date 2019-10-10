@@ -37,12 +37,10 @@ void SectorPresetsWidget::createContent()
         checkBox->setTristate(false);
         layout->addWidget(checkBox);
 
-        checkBox->setChecked(Settings::getInstance().loadPresetState(i));
+        checkBox->setChecked(presets[i].selected);
 
         connect(checkBox, &QCheckBox::stateChanged, [this, i](int state) {
-            const auto checked = state == Qt::CheckState::Checked;
-            m_model.setPresetSelected(i, checked);
-            Settings::getInstance().savePresetState(i, checked);
+            m_model.setPresetSelected(i, state == Qt::CheckState::Checked);
         });
     }
 }

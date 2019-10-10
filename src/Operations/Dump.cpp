@@ -103,8 +103,8 @@ void Dump::dumpPreset(const SectorPresetsModel::Preset &preset, size_t index)
 
         emit notifyProgress(static_cast<int>(dataSize), static_cast<int>(current), progressString);
 
-        chunks.emplace_back();
-        getProgrammer().readData(chunks.back(), address, chunkSize);
+        auto &chunk = chunks.emplace_back();
+        getProgrammer().readData(chunk, address, chunkSize);
     }
 
     // Запись в файл
