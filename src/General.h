@@ -8,6 +8,10 @@
 #define APP_VERSION "DEV"
 #endif
 
+#ifndef LOGGING_ENABLED
+#define LOGGING_ENABLED 1
+#endif
+
 namespace app
 {
 enum class ConnectionState

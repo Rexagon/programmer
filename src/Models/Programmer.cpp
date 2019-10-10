@@ -10,6 +10,8 @@
 #include <sitl/commands/Mrd.h>
 #include <sitl/commands/Mwr.h>
 
+#include "../General.h"
+
 using namespace sitl::cmds;
 
 namespace
@@ -36,7 +38,7 @@ constexpr uint16_t RESET = 3u;     // Сигнал сброса программ
 namespace app
 {
 Programmer::Programmer(const std::string &port, unsigned int baudRate)
-    : m_connection{port, baudRate, true}
+    : m_connection{port, baudRate, LOGGING_ENABLED}
 {
     // Проверяем соединение
     m_connection.setResponseTimeout(2);

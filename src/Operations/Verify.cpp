@@ -97,7 +97,7 @@ void Verify::run()
             }
 
             resultText +=
-                QString("\t%1. Отличаются сектора:\n\t\t%2\n").arg(item.first.name).arg(sectorsText.join(", "));
+                QString("    %1. Отличаются сектора:\n    %2\n\n").arg(item.first.name).arg(sectorsText.join(", "));
         }
 
         emit notifyProgress(1, 1, QString("Найдены различия:\n%1").arg(resultText));
@@ -114,10 +114,10 @@ QString Verify::getDescription() const
     for (const auto &item : selectedPresets)
     {
         const auto &preset = item.first;
-        presetsString += QString("\t%1\n").arg(preset.name);
+        presetsString += QString("    %1\n").arg(preset.name);
     }
 
-    return QString("Сравнить файл:\n\t%1\nС данными в секторах:\n%2").arg(m_file.fileName()).arg(presetsString);
+    return QString("Сравнить файл:\n    %1\nС данными в секторах:\n%2").arg(m_file.fileName()).arg(presetsString);
 }
 
 
@@ -162,6 +162,7 @@ std::optional<Verify::Differences> Verify::verifyPreset(const SectorPresetsModel
             const auto mismatch = compare(data.data() + current, chunk.data(), chunkSize);
             if (mismatch)
             {
+                printf("%u\n", *mismatch);
                 differences.second.emplace_back(i);
                 break;
             }

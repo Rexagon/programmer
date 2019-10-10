@@ -69,7 +69,7 @@ QString Dump::getDescription() const
     QString presetsString;
     for (const auto &[preset, index] : selectedPresets)
     {
-        presetsString += QString("\t%1\n\t\tв %2\n").arg(preset.name).arg(m_files[index]->fileName());
+        presetsString += QString("    %1\n    в %2\n\n").arg(preset.name).arg(m_files[index]->fileName());
     }
 
     return QString("Считывание:\n%1").arg(presetsString);

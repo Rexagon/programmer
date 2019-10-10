@@ -94,10 +94,10 @@ QString Program::getDescription() const
     for (const auto &item : selectedPresets)
     {
         const auto &preset = item.first;
-        presetsString += QString("\t%1\n").arg(preset.name);
+        presetsString += QString("    %1\n").arg(preset.name);
     }
 
-    return QString("Запись прошивки:\n\t%1\nВ секторы:\n%2").arg(m_file.fileName()).arg(presetsString);
+    return QString("Запись прошивки:\n    %1\nВ секторы:\n%2").arg(m_file.fileName()).arg(presetsString);
 }
 
 

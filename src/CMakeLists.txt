@@ -37,7 +37,11 @@ set(PROGRAMMER_MOC_TARGETS
     Windows/OperationDialog.h
 )
 
-add_executable(programmer ${PROGRAMMER_SRC} ${PROGRAMMER_MOC_TARGETS})
+if(CMAKE_BUILD_TYPE MATCHES Release)
+    set(ADDITIONAL_EXECUTABLE_OPTIONS WIN32)
+endif()
+
+add_executable(programmer ${ADDITIONAL_EXECUTABLE_OPTIONS} ${PROGRAMMER_SRC} ${PROGRAMMER_MOC_TARGETS})
 
 target_include_directories(programmer
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -77,8 +81,16 @@ set_target_properties(programmer
     RUNTIME_OUTPUT_DIRECTORY ${BUILD_OUTPUT_DIR}
 )
 
+if(CMAKE_BUILD_TYPE MATCHES Release)
+    set(LOGGING_ENABLED false)
+else()
+    set(LOGGING_ENABLED true)
+endif()
+
 target_compile_definitions(programmer
-    PRIVATE APP_VERSION="$ENV{APP_VERSION}")
+    PRIVATE
+        APP_VERSION="$ENV{APP_VERSION}"
+        LOGGING_ENABLED=${LOGGING_ENABLED})
 
 # deployment
 
