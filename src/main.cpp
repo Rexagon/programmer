@@ -5,9 +5,12 @@
 int main(int argc, char **argv)
 {
     QApplication programmer(argc, argv);
+    QApplication::setOrganizationName("RC MODULE");
+    QApplication::setApplicationName("Programmer");
+    QApplication::setApplicationVersion(APP_VERSION);
 
     app::MainWindow mainWindow;
     mainWindow.show();
 
-    return programmer.exec();
+    return QApplication::exec();
 }

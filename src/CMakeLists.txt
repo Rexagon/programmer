@@ -41,7 +41,12 @@ if(CMAKE_BUILD_TYPE MATCHES Release)
     set(ADDITIONAL_EXECUTABLE_OPTIONS WIN32)
 endif()
 
-add_executable(programmer ${ADDITIONAL_EXECUTABLE_OPTIONS} ${PROGRAMMER_SRC} ${PROGRAMMER_MOC_TARGETS})
+add_executable(programmer
+    ${ADDITIONAL_EXECUTABLE_OPTIONS}
+    ${PROGRAMMER_SRC}
+    ${PROGRAMMER_MOC_TARGETS}
+    ${CMAKE_SOURCE_DIR}/res/programmer.rc
+)
 
 target_include_directories(programmer
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
