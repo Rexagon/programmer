@@ -48,6 +48,8 @@ void Program::run()
 
         for (size_t i = 0; i < sectors.size(); ++i)
         {
+            checkCancelled();
+
             emit notifyProgress(static_cast<int>(sectors.size()), static_cast<int>(i),
                                 QString("%1\nОчищено секторов: %2 из %3").arg(preset.name).arg(i).arg(sectors.size()));
 
@@ -58,27 +60,54 @@ void Program::run()
     // Ожидание очистки секторов
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
-    // Включение режима программирования
-    emit notifyProgress(0, 0, "Включение режима программирования");
-    getProgrammer().enableProgramming();
+    //
+    checkCancelled();
 
-    // Ожидание включения режима программирования
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    const auto disableProgramming = [this]() {
+        emit notifyProgress(0, 0, "Выключение режима программирования");
+        getProgrammer().disableProgramming();
+    };
 
-    // Чтение файла с прошивкой
-    emit notifyProgress(0, 0, "Чтение файла");
-    const auto data = m_file.readAll();
-
-    // Программирование
-    for (const auto &item : selectedPresets)
+    try
     {
-        const auto &preset = item.first;
-        programPreset(preset, data);
-    }
+        // Включение режима программирования
+        emit notifyProgress(0, 0, "Включение режима программирования");
+        getProgrammer().enableProgramming();
 
-    // Выключение режима программирования
-    emit notifyProgress(0, 0, "Выключение режима программирования");
-    getProgrammer().disableProgramming();
+        //
+        checkCancelled();
+
+        // Ожидание включения режима программирования
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        //
+        checkCancelled();
+
+        // Чтение файла с прошивкой
+        emit notifyProgress(0, 0, "Чтение файла");
+        const auto data = m_file.readAll();
+
+        //
+        checkCancelled();
+
+        // Программирование
+        for (const auto &item : selectedPresets)
+        {
+            const auto &preset = item.first;
+            programPreset(preset, data);
+        }
+
+        // Выключение режима программирования
+        disableProgramming();
+    }
+    catch (const Operation::CancelledException &e)
+    {
+        // Выключение режима программирования
+        disableProgramming();
+
+        //
+        throw e;
+    }
 
     // Готово
     emit notifyProgress(1, 1, "Готово");
@@ -120,6 +149,9 @@ void Program::programPreset(const app::SectorPresetsModel::Preset &preset, const
 
     for (auto address = begin; address < end; address += chunkSize)
     {
+        //
+        checkCancelled();
+
         const auto current = address - begin;
         const auto progressString =
             QString("%1\nЗаписано байт: %L2 из %L3").arg(preset.name).arg(current).arg(dataSize);

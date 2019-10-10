@@ -97,6 +97,8 @@ void Dump::dumpPreset(const SectorPresetsModel::Preset &preset, size_t index)
     // Считываем память
     for (auto address = begin; address < end; address += chunkSize)
     {
+        checkCancelled();
+
         const auto current = address - begin;
         const auto progressString =
             QString("%1\nСкопировано байт: %L2 из %L3").arg(preset.name).arg(current).arg(dataSize);
@@ -113,6 +115,8 @@ void Dump::dumpPreset(const SectorPresetsModel::Preset &preset, size_t index)
     int currentChunk = 0;
     for (const auto &chunk : chunks)
     {
+        checkCancelled();
+
         const auto progressString =
             QString("%1\nЗапись в файл: %2 / %3").arg(preset.name).arg(currentChunk + 1).arg(chunks.size());
 

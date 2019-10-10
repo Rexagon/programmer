@@ -5,10 +5,9 @@
 
 #include "OperationDialog.h"
 
-#include <thread>
-
 #include <QHBoxLayout>
-#include <QVBoxLayout>
+#include <QMessageBox>
+#include <QPushButton>
 
 namespace
 {
@@ -32,6 +31,15 @@ OperationDialog::OperationDialog(std::unique_ptr<Operation> operation, QWidget *
 }
 
 
+OperationDialog::~OperationDialog()
+{
+    if (m_operationThread.has_value())
+    {
+        m_operationThread->join();
+    }
+}
+
+
 void OperationDialog::setState(const State state)
 {
     m_state = state;
@@ -39,6 +47,8 @@ void OperationDialog::setState(const State state)
     m_confirmationTab->setVisible(state == State::CONFIRMATION);
     m_progressTab->setVisible(state == State::PROGRESS || state == State::CONCLUSION);
 
+    m_cancellationButton->setEnabled(state == State::PROGRESS);
+    m_cancellationButton->setVisible(state == State::PROGRESS);
     m_conclusionButton->setEnabled(state == State::CONCLUSION);
 
     QString title;
@@ -160,6 +170,9 @@ void OperationDialog::createProgressTab()
 
     actionsLayout->addStretch();
 
+    m_cancellationButton = new QPushButton("Отмена", this);
+    actionsLayout->addWidget(m_cancellationButton);
+
     m_conclusionButton = new QPushButton("Готово", this);
     actionsLayout->addWidget(m_conclusionButton);
 
@@ -173,12 +186,26 @@ void OperationDialog::connectSignals()
     connect(m_confirmationAcceptButton, &QPushButton::clicked, [this] {
         setState(State::PROGRESS);
 
-        std::thread{[this] { m_operation->run(); }}.detach();
+        m_operationThread = std::thread{[this] {
+            try
+            {
+                m_operation->run();
+            }
+            catch (const Operation::CancelledException &)
+            {
+                emit m_operation->notifyComplete(false);
+            }
+        }};
     });
 
     connect(m_operation.get(), &Operation::notifyProgress, this, &OperationDialog::onProgress);
     connect(m_operation.get(), &Operation::notifyComplete, this, &OperationDialog::onComplete);
+    connect(m_operation.get(), &Operation::showCancellationDialog, this, &OperationDialog::onShowCancellationDialog);
 
+    connect(m_cancellationButton, &QPushButton::clicked, [this] {
+        m_cancellationButton->setEnabled(false);
+        m_operation->requestCancellation();
+    });
     connect(m_conclusionButton, &QPushButton::clicked, [this] { close(); });
 }
 
@@ -191,9 +218,34 @@ void OperationDialog::onProgress(int total, int current, const QString &message)
 }
 
 
-void OperationDialog::onComplete(bool /*success*/)
+void OperationDialog::onComplete(bool success)
 {
-    setState(State::CONCLUSION);
+    if (success)
+    {
+        setState(State::CONCLUSION);
+    }
+    else
+    {
+        close();
+    }
+}
+
+
+void OperationDialog::onShowCancellationDialog()
+{
+    QMessageBox messageBox{this};
+    messageBox.setWindowTitle(m_operation->getName());
+    messageBox.setText("Вы действительно хотите прервать операцию?");
+
+    auto *confirmButton = messageBox.addButton("Да", QMessageBox::YesRole);
+    messageBox.addButton("Нет", QMessageBox::NoRole);
+
+    messageBox.exec();
+
+    const auto shouldCancel = messageBox.clickedButton() == confirmButton;
+    m_cancellationButton->setEnabled(!shouldCancel);
+
+    m_operation->finishCancellation(shouldCancel);
 }
 
 } // namespace app

@@ -2,6 +2,7 @@
 #define PROGRAMMER_SRC_WINDOWS_OPERATIONDIALOG_H_
 
 #include <memory>
+#include <thread>
 
 #include <QDialog>
 #include <QLabel>
@@ -33,6 +34,8 @@ public:
      */
     explicit OperationDialog(std::unique_ptr<Operation> operation, QWidget *parent = nullptr);
 
+    ~OperationDialog() override;
+
 public:
     OperationDialog(const OperationDialog &) = delete;
     OperationDialog &operator=(const OperationDialog &) = delete;
@@ -50,10 +53,12 @@ private:
 
     void onProgress(int total, int current, const QString &message);
     void onComplete(bool success);
+    void onShowCancellationDialog();
 
 private:
     State m_state;
     std::unique_ptr<Operation> m_operation;
+    std::optional<std::thread> m_operationThread = std::nullopt;
 
     QWidget *m_confirmationTab = nullptr;
     QWidget *m_progressTab = nullptr;
@@ -64,6 +69,7 @@ private:
     QLabel *m_progressLabel = nullptr;
     QProgressBar *m_progressBar = nullptr;
 
+    QPushButton *m_cancellationButton = nullptr;
     QPushButton *m_conclusionButton = nullptr;
 };
 

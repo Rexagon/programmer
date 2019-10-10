@@ -1,7 +1,9 @@
 #ifndef PROGRAMMER_SRC_OPERATIONS_OPERATION_H_
 #define PROGRAMMER_SRC_OPERATIONS_OPERATION_H_
 
+#include <condition_variable>
 #include <functional>
+#include <mutex>
 
 #include <QObject>
 #include <QString>
@@ -19,6 +21,14 @@ class Operation : public QObject
     Q_OBJECT
 
 public:
+    struct CancelledException : public std::exception
+    {
+        const char *what() const noexcept override
+        {
+            return "operation cancelled";
+        }
+    };
+
     /**
      * @param programmer    Объект подключения к программатору
      * @param model         Таблица секторов
@@ -56,6 +66,19 @@ public:
      */
     virtual QString getDescription() const = 0;
 
+    /**
+     * @brief   Пометить операцию, как ожидающую отмены
+     */
+    void requestCancellation();
+
+    /*
+     * @brief   Разблокировать ожидающий поток результатом отмены
+     *
+     * @note
+     * Нужно вызывать только после @a requestCancellation()
+     */
+    void finishCancellation(bool result);
+
 public:
     Operation(const Operation &) = delete;
     Operation &operator=(const Operation &) = delete;
@@ -65,11 +88,14 @@ public:
 signals:
     void notifyProgress(int total, int current, const QString &description = "");
     void notifyComplete(bool success = true);
+    void showCancellationDialog();
 
 protected:
     Programmer &getProgrammer() const;
     const SectorPresetsModel &getSectorPresetsModel() const;
     const std::vector<std::pair<SectorPresetsModel::Preset, size_t>> &getSelectedPresets() const;
+
+    void checkCancelled();
 
 private:
     QString m_name;
@@ -77,6 +103,11 @@ private:
     Programmer &m_programmer;
     const SectorPresetsModel &m_sectorPresetsModel;
     std::vector<std::pair<SectorPresetsModel::Preset, size_t>> m_selectedPresets;
+
+    bool m_shouldStop = false;
+    std::mutex m_cancellationMutex{};
+    std::condition_variable m_cancellationGuard{};
+    std::optional<bool> m_cancellationResult = std::nullopt;
 };
 
 } // namespace app

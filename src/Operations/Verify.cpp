@@ -67,6 +67,8 @@ void Verify::run()
     emit notifyProgress(0, 0, "Чтение файла");
     const auto data = m_file.readAll();
 
+    checkCancelled();
+
     // Проверка групп секторов
     for (const auto &item : selectedPresets)
     {
@@ -151,6 +153,8 @@ std::optional<Verify::Differences> Verify::verifyPreset(const SectorPresetsModel
 
         for (auto address = sector.address; address < sectorEnd && address < end; address += chunkSize)
         {
+            checkCancelled();
+
             const auto current = address - begin;
             const auto progressString =
                 QString("%1\nПроверено байт: %L2 из %L3").arg(preset.name).arg(current).arg(dataSize);

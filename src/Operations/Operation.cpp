@@ -4,6 +4,9 @@
  */
 #include "Operation.h"
 
+#include <QMessageBox>
+#include <QPushButton>
+
 namespace app
 {
 Operation::Operation(Programmer &programmer, const SectorPresetsModel &model, const QString &name)
@@ -27,14 +30,52 @@ Programmer &Operation::getProgrammer() const
 }
 
 
+void Operation::requestCancellation()
+{
+    m_shouldStop = true;
+}
+
+
+void Operation::finishCancellation(bool result)
+{
+    m_cancellationMutex.lock();
+    m_cancellationResult = result;
+    m_cancellationMutex.unlock();
+    m_cancellationGuard.notify_one();
+}
+
+
 const SectorPresetsModel &Operation::getSectorPresetsModel() const
 {
     return m_sectorPresetsModel;
 }
 
+
 const std::vector<std::pair<SectorPresetsModel::Preset, size_t>> &Operation::getSelectedPresets() const
 {
     return m_selectedPresets;
+}
+
+
+void Operation::checkCancelled()
+{
+    if (!m_shouldStop)
+    {
+        return;
+    }
+
+    m_cancellationResult.reset();
+    emit showCancellationDialog();
+
+    std::unique_lock<std::mutex> lock{m_cancellationMutex};
+    m_cancellationGuard.wait(lock, [this] { return m_cancellationResult.has_value(); });
+
+    m_shouldStop = *m_cancellationResult;
+
+    if (*m_cancellationResult)
+    {
+        throw CancelledException{};
+    }
 }
 
 } // namespace app
