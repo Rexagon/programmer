@@ -22,8 +22,6 @@ OperationDialog::OperationDialog(std::unique_ptr<Operation> operation, QWidget *
     , m_state{DEFAULT_STATE}
     , m_operation{std::move(operation)}
 {
-    setAttribute(Qt::WA_DeleteOnClose);
-
     createUI();
     connectSignals();
 
@@ -33,10 +31,7 @@ OperationDialog::OperationDialog(std::unique_ptr<Operation> operation, QWidget *
 
 OperationDialog::~OperationDialog()
 {
-    if (m_operationThread.has_value())
-    {
-        m_operationThread->join();
-    }
+    stopOperation();
 }
 
 
@@ -226,6 +221,7 @@ void OperationDialog::onComplete(bool success)
     }
     else
     {
+        stopOperation();
         close();
     }
 }
@@ -246,6 +242,16 @@ void OperationDialog::onShowCancellationDialog()
     m_cancellationButton->setEnabled(!shouldCancel);
 
     m_operation->finishCancellation(shouldCancel);
+}
+
+
+void OperationDialog::stopOperation()
+{
+    if (m_operationThread.has_value())
+    {
+        m_operationThread->join();
+        m_operationThread.reset();
+    }
 }
 
 } // namespace app

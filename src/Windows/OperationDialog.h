@@ -55,6 +55,8 @@ private:
     void onComplete(bool success);
     void onShowCancellationDialog();
 
+    void stopOperation();
+
 private:
     State m_state;
     std::unique_ptr<Operation> m_operation;

@@ -118,8 +118,8 @@ void MainWindow::runOperation(std::unique_ptr<Operation> operation)
         return;
     }
 
-    auto *dialog = new OperationDialog(std::move(operation), this);
-    dialog->open();
+    m_operationDialog = std::make_unique<OperationDialog>(std::move(operation));
+    m_operationDialog->open();
 }
 
 

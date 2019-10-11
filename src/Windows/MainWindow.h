@@ -8,6 +8,7 @@
 #include "MainWindowUI.h"
 #include "Models/Programmer.h"
 #include "Models/SectorPresetsModel.h"
+#include "OperationDialog.h"
 #include "Operations/Operation.h"
 
 namespace app
@@ -43,7 +44,7 @@ private:
     void syncState();
 
     SectorPresetsModel m_sectorPresetsModel{};
-    std::unique_ptr<Programmer> m_programmer{};
+    std::unique_ptr<Programmer> m_programmer = nullptr;
 
     MainWindowUI m_ui;
 
@@ -51,6 +52,7 @@ private:
     ApplicationState m_applicationState;
 
     QFileDialog *m_fileDialog = nullptr;
+    std::unique_ptr<OperationDialog> m_operationDialog = nullptr;
 };
 
 } // namespace app
