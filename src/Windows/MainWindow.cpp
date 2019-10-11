@@ -7,6 +7,7 @@
 
 #include <iostream>
 
+#include <QCloseEvent>
 #include <QMessageBox>
 
 #include "OperationDialog.h"
@@ -118,8 +119,11 @@ void MainWindow::runOperation(std::unique_ptr<Operation> operation)
         return;
     }
 
+    setEnabled(false);
+
     m_operationDialog = std::make_unique<OperationDialog>(std::move(operation));
     m_operationDialog->open();
+    connect(m_operationDialog.get(), &QDialog::finished, [this](int) { setEnabled(true); });
 }
 
 
@@ -160,6 +164,19 @@ void MainWindow::syncState()
 {
     m_ui.setConnectionState(m_connectionState);
     m_ui.setApplicationState(m_applicationState);
+}
+
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (isEnabled())
+    {
+        event->accept();
+    }
+    else
+    {
+        event->ignore();
+    }
 }
 
 } // namespace app

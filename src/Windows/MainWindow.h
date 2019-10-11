@@ -43,6 +43,8 @@ private:
     void connectSignals();
     void syncState();
 
+    void closeEvent(QCloseEvent *event) override;
+
     SectorPresetsModel m_sectorPresetsModel{};
     std::unique_ptr<Programmer> m_programmer = nullptr;
 
