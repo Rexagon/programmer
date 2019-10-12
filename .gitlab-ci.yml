@@ -1,0 +1,48 @@
+.environment: &environment
+  image: $DOCKERHUB/kpa/cmake-gcc_cpp-boost-python-qt
+  tags:
+    - kpa
+    - docker
+    - debian
+
+.submodule: &submodule
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+
+
+stages:
+  - build
+
+build_develop:
+  <<: *environment
+  <<: *submodule
+  stage: build
+  only:
+    - develop
+  script:
+    - export APP_VERSION=$CI_COMMIT_SHORT_SHA
+    - sh build.sh --without-deployment
+    - cp -r ~/qtdist/* build/
+    - cp 3rdparty/sitl/dist/bin/*.dll build/
+    - mv build programmer
+  artifacts:
+    paths:
+      - programmer
+    expire_in: 3 weeks
+
+build_tag:
+  <<: *environment
+  <<: *submodule
+  stage: build
+  only:
+    - tags
+  script:
+    - export APP_VERSION=$CI_COMMIT_TAG
+    - sh build.sh --without-deployment
+    - cp -r ~/qtdist/* build/
+    - cp 3rdparty/sitl/dist/bin/*.dll build/
+    - mv build programmer
+  artifacts:
+    paths:
+      - programmer
+    expire_in: 6 months

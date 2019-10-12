@@ -1,17 +1,58 @@
 set(PROGRAMMER_SRC
-    MainWindow.cpp
-    main.cpp)
+    Models/SerialPortListModel.cpp
+    Models/SectorPresetsModel.cpp
+    Models/Programmer.cpp
 
-add_executable(programmer ${PROGRAMMER_SRC})
+    Operations/Operation.cpp
+    Operations/Dump.cpp
+    Operations/Program.cpp
+    Operations/Verify.cpp
 
-target_include_directories(programmer
-    PUBLIC
-        ${CMAKE_SOURCE_DIR}/include
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
+    Widgets/ConnectionWidget.cpp
+    Widgets/SectorPresetsWidget.cpp
+    Widgets/SerialPortSelector.cpp
+
+    Windows/MainWindow.cpp
+    Windows/MainWindowUI.cpp
+    Windows/OperationDialog.cpp
+
+    Settings.cpp
+
+    main.cpp
 )
 
-target_link_libraries(programmer sitl::sitl Qt5::Core Qt5::Widgets)
+set(PROGRAMMER_MOC_TARGETS
+    Models/SerialPortListModel.h
+
+    Operations/Dump.h
+    Operations/Operation.h
+    Operations/Program.h
+    Operations/Verify.h
+
+    Widgets/ConnectionWidget.h
+    Widgets/SectorPresetsWidget.h
+    Widgets/SerialPortSelector.h
+
+    Windows/MainWindow.h
+    Windows/OperationDialog.h
+)
+
+if(CMAKE_BUILD_TYPE MATCHES Release)
+    set(ADDITIONAL_EXECUTABLE_OPTIONS WIN32)
+endif()
+
+add_executable(programmer
+    ${ADDITIONAL_EXECUTABLE_OPTIONS}
+    ${PROGRAMMER_SRC}
+    ${PROGRAMMER_MOC_TARGETS}
+    ${CMAKE_SOURCE_DIR}/res/programmer.rc
+)
+
+target_include_directories(programmer
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_link_libraries(programmer sitl::sitl Qt5::Core Qt5::Widgets Qt5::SerialPort)
 
 target_compile_options(programmer PRIVATE
     -O2
@@ -39,3 +80,37 @@ target_compile_features(programmer PUBLIC
     cxx_std_17
     cxx_user_literals
 )
+
+set_target_properties(programmer
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${BUILD_OUTPUT_DIR}
+)
+
+if(CMAKE_BUILD_TYPE MATCHES Release)
+    set(LOGGING_ENABLED false)
+else()
+    set(LOGGING_ENABLED true)
+endif()
+
+target_compile_definitions(programmer
+    PRIVATE
+        APP_VERSION="$ENV{APP_VERSION}"
+        LOGGING_ENABLED=${LOGGING_ENABLED})
+
+# deployment
+
+set(WINDEPLOYQT_EXE $ENV{Qt5_DIR}/../../../bin/windeployqt.exe)
+
+if(CMAKE_BUILD_TYPE MATCHES Release)
+    set(DEPLOYMENT_FLAGS --no-quick-import --no-translations --release)
+elseif()
+    set(DEPLOYMENT_FLAGS --no-quick-import --no-translations --debug)
+endif()
+
+add_custom_command(TARGET programmer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EXTLIBS_DIR}/sitl/dist/bin/libsitl.dll ${BUILD_OUTPUT_DIR}/)
+
+if (WIN_DEPLOY)
+    add_custom_command(TARGET programmer POST_BUILD
+        COMMAND ${WINDEPLOYQT_EXE} ${DEPLOYMENT_FLAGS} ${BUILD_OUTPUT_DIR}/programmer.exe)
+endif()
